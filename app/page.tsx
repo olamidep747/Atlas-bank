@@ -41,7 +41,7 @@ export default function Home() {
           <div className="orbit orbit-a"/><div className="orbit orbit-b"/>
           <div className="floating-label label-top"><span className="status-dot"/> Your money, in motion</div>
           <div className="bank-card"><div className="card-top"><span className="card-brand">ATLAS<span>BANK</span></span><span className="card-chip"><i/></span></div><div className="card-number">•••• &nbsp; •••• &nbsp; •••• &nbsp; 2048</div><div className="card-bottom"><span>ATLAS MEMBER</span><span className="card-circles"><i/><i/></span></div></div>
-          <div className="account-float"><div className="account-heading"><span>ACCOUNT OVERVIEW</span><span className="account-menu">•••</span></div><small>Available balance</small><strong>$12,480<span>.50</span></strong><div className="balance-line"><span>Monthly activity</span><b>+12.8%</b></div><div className="mini-bars"><i/><i/><i/><i/><i/><i/><i/><i/><i/><i/><i/><i/></div></div>
+          <div className="account-float"><div className="account-heading"><span>ACCOUNT OVERVIEW</span><span className="account-menu">•••</span></div><small>Available balance</small><strong>$22,000<span>.00</span></strong><div className="balance-line"><span>Monthly activity</span><b>+12.8%</b></div><div className="mini-bars"><i/><i/><i/><i/><i/><i/><i/><i/><i/><i/><i/><i/></div></div>
           <div className="floating-label label-bottom"><span className="secure-icon"><ShieldCheck size={17}/></span><span><b>Security comes first</b><small>Protection built in</small></span></div>
           <div className="hero-star">✳</div>
         </div>
