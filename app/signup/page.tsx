@@ -5,7 +5,51 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight, ShieldCheck } from "lucide-react";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
+const countries = [
+  "Afghanistan","Albania","Algeria","Andorra","Angola","Antigua and Barbuda","Argentina","Armenia","Australia","Austria","Azerbaijan",
+  "Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bhutan","Bolivia","Bosnia and Herzegovina","Botswana","Brazil","Brunei","Bulgaria","Burkina Faso","Burundi",
+  "Cambodia","Cameroon","Canada","Cape Verde","Central African Republic","Chad","Chile","China","Colombia","Comoros","Congo","Costa Rica","Côte d’Ivoire","Croatia","Cuba","Cyprus","Czechia",
+  "Denmark","Djibouti","Dominica","Dominican Republic","DR Congo",
+  "Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia","Eswatini","Ethiopia",
+  "Fiji","Finland","France",
+  "Gabon","Gambia","Georgia","Germany","Ghana","Greece","Grenada","Guatemala","Guinea","Guinea-Bissau","Guyana",
+  "Haiti","Honduras","Hungary",
+  "Iceland","India","Indonesia","Iran","Iraq","Ireland","Israel","Italy",
+  "Jamaica","Japan","Jordan",
+  "Kazakhstan","Kenya","Kiribati","Kosovo","Kuwait","Kyrgyzstan",
+  "Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg",
+  "Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Marshall Islands","Mauritania","Mauritius","Mexico","Micronesia","Moldova","Monaco","Mongolia","Montenegro","Morocco","Mozambique","Myanmar",
+  "Namibia","Nauru","Nepal","Netherlands","New Zealand","Nicaragua","Niger","Nigeria","North Korea","North Macedonia","Norway",
+  "Oman",
+  "Pakistan","Palau","Palestine","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland","Portugal",
+  "Qatar",
+  "Romania","Russia","Rwanda",
+  "Saint Kitts and Nevis","Saint Lucia","Saint Vincent and the Grenadines","Samoa","San Marino","São Tomé and Príncipe","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","Solomon Islands","Somalia","South Africa","South Korea","South Sudan","Spain","Sri Lanka","Sudan","Suriname","Sweden","Switzerland","Syria",
+  "Taiwan","Tajikistan","Tanzania","Thailand","Timor-Leste","Togo","Tonga","Trinidad and Tobago","Tunisia","Turkey","Turkmenistan","Tuvalu",
+  "Uganda","Ukraine","United Arab Emirates","United Kingdom","United States","Uruguay","Uzbekistan",
+  "Vanuatu","Vatican City","Venezuela","Vietnam",
+  "Yemen",
+  "Zambia","Zimbabwe"
+];
+
+const currencies = [
+  ["USD","US Dollar"],["EUR","Euro"],["GBP","British Pound"],["NGN","Nigerian Naira"],["CAD","Canadian Dollar"],["AUD","Australian Dollar"],
+  ["CHF","Swiss Franc"],["CNY","Chinese Yuan"],["GHS","Ghanaian Cedi"],["KES","Kenyan Shilling"],["ZAR","South African Rand"],["AED","UAE Dirham"],
+  ["JPY","Japanese Yen"],["INR","Indian Rupee"],["SGD","Singapore Dollar"],["NZD","New Zealand Dollar"],["XOF","West African CFA Franc"],["XAF","Central African CFA Franc"]
+];
+
+type SignupDetails = {
+  fullName: string; dateOfBirth: string; phone: string; country: string;
+  gender: string; employmentStatus: string; accountType: string; currency: string;
+};
+
+const emptyDetails: SignupDetails = {
+  fullName: "", dateOfBirth: "", phone: "", country: "", gender: "",
+  employmentStatus: "", accountType: "", currency: "USD"
+};
+
 export default function SignupPage() {
+  const [details, setDetails] = useState<SignupDetails>(emptyDetails);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
@@ -13,6 +57,10 @@ export default function SignupPage() {
   const [notice, setNotice] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
+
+  function updateDetail<K extends keyof SignupDetails>(key: K, value: SignupDetails[K]) {
+    setDetails(previous => ({ ...previous, [key]: value }));
+  }
 
   async function handleSignup(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -23,11 +71,21 @@ export default function SignupPage() {
       const { data, error } = await getSupabaseBrowserClient().auth.signUp({
         email: email.trim(),
         password,
+        options: {
+          data: {
+            full_name: details.fullName.trim(),
+            date_of_birth: details.dateOfBirth,
+            phone: details.phone.trim(),
+            country: details.country,
+            gender: details.gender,
+            employment_status: details.employmentStatus,
+            account_type: details.accountType,
+            preferred_currency: details.currency
+          }
+        }
       });
       if (error) throw error;
 
-      // A signup session must never leave the visitor logged in before the
-      // verification step. Clear any session Supabase unexpectedly returns.
       if (data.session) {
         const { error: signOutError } = await getSupabaseBrowserClient().auth.signOut();
         if (signOutError) throw signOutError;
@@ -51,7 +109,7 @@ export default function SignupPage() {
       const { error } = await getSupabaseBrowserClient().auth.verifyOtp({
         email: email.trim(),
         token: code,
-        type: "signup",
+        type: "signup"
       });
       if (error) throw error;
       setNotice("Your email is verified and your ATLAS account is created. You can now sign in.");
@@ -69,7 +127,7 @@ export default function SignupPage() {
     try {
       const { error } = await getSupabaseBrowserClient().auth.resend({
         type: "signup",
-        email: email.trim(),
+        email: email.trim()
       });
       if (error) throw error;
       setNotice("A new verification code has been requested. Check your inbox and spam folder.");
@@ -79,6 +137,9 @@ export default function SignupPage() {
       setLoading(false);
     }
   }
+
+  const fieldStyle: React.CSSProperties = { width: "100%", boxSizing: "border-box" };
+  const gridStyle: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: "0 16px" };
 
   return (
     <main className="login-page">
@@ -99,14 +160,63 @@ export default function SignupPage() {
           <div className="login-mobile-brand"><span className="login-brand-mark">A</span> ATLAS BANK</div>
           <div className="login-heading-kicker">GET STARTED</div>
           <h2>{codeSent ? "Verify your email." : "Create your account."}</h2>
-          <p className="login-subtitle">{codeSent ? `Enter the six-digit code sent to ${email}.` : "Enter your email and create a password. We'll email you a verification code."}</p>
+          <p className="login-subtitle">{codeSent ? `Enter the six-digit code sent to ${email}.` : "Complete your details to open your ATLAS account."}</p>
           {!codeSent ? (
             <form onSubmit={handleSignup}>
-              <label htmlFor="email">Email address</label>
-              <input id="email" type="email" autoComplete="email" placeholder="you@example.com" value={email} onChange={e=>setEmail(e.target.value)} required/>
-              <label htmlFor="password">Create password</label>
-              <input id="password" type="password" autoComplete="new-password" placeholder="At least 8 characters" value={password} onChange={e=>setPassword(e.target.value)} required minLength={8}/>
-              <button className="button button-gold login-submit" type="submit" disabled={loading}>{loading ? "Creating account..." : "Sign up"} <ArrowRight size={18}/></button>
+              <label htmlFor="fullName">Full name</label>
+              <input style={fieldStyle} id="fullName" type="text" autoComplete="name" placeholder="Enter your full name" value={details.fullName} onChange={e=>updateDetail("fullName",e.target.value)} required/>
+
+              <div style={gridStyle}>
+                <div>
+                  <label htmlFor="dateOfBirth">Date of birth</label>
+                  <input style={fieldStyle} id="dateOfBirth" type="date" autoComplete="bday" value={details.dateOfBirth} onChange={e=>updateDetail("dateOfBirth",e.target.value)} required/>
+                </div>
+                <div>
+                  <label htmlFor="phone">Phone number</label>
+                  <input style={fieldStyle} id="phone" type="tel" autoComplete="tel" placeholder="+234..." value={details.phone} onChange={e=>updateDetail("phone",e.target.value)} required/>
+                </div>
+                <div>
+                  <label htmlFor="country">Country</label>
+                  <select style={fieldStyle} id="country" value={details.country} onChange={e=>updateDetail("country",e.target.value)} required>
+                    <option value="">Select your country</option>
+                    {countries.map(country=><option key={country} value={country}>{country}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="gender">Gender</label>
+                  <select style={fieldStyle} id="gender" value={details.gender} onChange={e=>updateDetail("gender",e.target.value)} required>
+                    <option value="">Select gender</option><option>Female</option><option>Male</option><option>Prefer not to say</option>
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="employmentStatus">Employment status</label>
+                  <select style={fieldStyle} id="employmentStatus" value={details.employmentStatus} onChange={e=>updateDetail("employmentStatus",e.target.value)} required>
+                    <option value="">Select employment status</option>
+                    <option>Employed</option><option>Self-employed</option><option>Unemployed</option><option>Student</option><option>Retired</option><option>Business owner</option>
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="accountType">Account type</label>
+                  <select style={fieldStyle} id="accountType" value={details.accountType} onChange={e=>updateDetail("accountType",e.target.value)} required>
+                    <option value="">Select account type</option><option>Personal</option><option>Business</option><option>Savings</option><option>Current</option>
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="currency">Preferred currency</label>
+                  <select style={fieldStyle} id="currency" value={details.currency} onChange={e=>updateDetail("currency",e.target.value)} required>
+                    {currencies.map(([code,name])=><option key={code} value={code}>{code} — {name}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="email">Email address</label>
+                  <input style={fieldStyle} id="email" type="email" autoComplete="email" placeholder="you@example.com" value={email} onChange={e=>setEmail(e.target.value)} required/>
+                </div>
+                <div>
+                  <label htmlFor="password">Create password</label>
+                  <input style={fieldStyle} id="password" type="password" autoComplete="new-password" placeholder="At least 8 characters" value={password} onChange={e=>setPassword(e.target.value)} required minLength={8}/>
+                </div>
+              </div>
+              <button className="button button-gold login-submit" type="submit" disabled={loading}>{loading ? "Creating account..." : "Continue to verification"} <ArrowRight size={18}/></button>
             </form>
           ) : (
             <>
