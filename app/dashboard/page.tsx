@@ -14,6 +14,9 @@ export default function DashboardPage() {
   const [email, setEmail] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const [checking, setChecking] = useState(true);
+  const [accountNumber, setAccountNumber] = useState("");
+  const [balance, setBalance] = useState("0.00");
+  const [currency, setCurrency] = useState("USD");
 
   useEffect(() => {
     const supabase = getSupabaseBrowserClient();
@@ -28,6 +31,18 @@ export default function DashboardPage() {
       const fullName = user.user_metadata?.full_name;
       setName(typeof fullName === "string" && fullName.trim() ? fullName.trim().split(" ")[0] : "there");
       setEmail(user.email ?? "");
+      const { data: profile } = await supabase
+        .from("novexxa_profiles")
+        .select("account_number, demo_balance, currency_code, display_name")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (!alive) return;
+      if (profile) {
+        setAccountNumber(profile.account_number ?? "");
+        setBalance(Number(profile.demo_balance ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+        setCurrency(profile.currency_code ?? "USD");
+        if (profile.display_name) setName(String(profile.display_name).trim().split(" ")[0]);
+      }
       setChecking(false);
     });
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -74,10 +89,10 @@ export default function DashboardPage() {
         <section className="atlas-savings-card" id="accounts">
           <div className="atlas-savings-card-top"><div className="atlas-savings-icon"><Wallet size={21}/></div><span className="atlas-account-status"><i/> ACCOUNT OVERVIEW</span></div>
           <div className="atlas-savings-label">Savings Account</div>
-          <div className="atlas-savings-currency">USD <span>· US Dollar account</span></div>
+          <div className="atlas-savings-currency">{currency} <span>· {currency === "USD" ? "US Dollar" : currency} account</span></div>
           <div className="atlas-savings-divider"/>
-          <div className="atlas-savings-bottom"><div><small>Available balance</small><strong>— — —</strong></div><div><small>Pending balance</small><strong>— — —</strong></div><div className="atlas-savings-account"><small>Account holder</small><strong>{name}</strong></div></div>
-          <div className="atlas-savings-footnote">Your verified account balances will appear here once your account data is connected.</div>
+          <div className="atlas-savings-bottom"><div><small>Available balance</small><strong>{currency} {balance}</strong></div><div><small>Account number</small><strong>{accountNumber || "Being assigned"}</strong></div><div className="atlas-savings-account"><small>Account holder</small><strong>{name}</strong></div></div>
+          <div className="atlas-savings-footnote">Your account number is permanently assigned and linked to your profile.</div>
         </section>
 
         <div className="atlas-dash-section-heading"><div><span>YOUR MONEY</span><h3>Quick actions</h3></div></div>
