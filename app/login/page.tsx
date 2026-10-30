@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Eye, EyeOff, ShieldCheck } from "lucide-react";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -24,7 +26,7 @@ export default function LoginPage() {
         password,
       });
       if (error) throw error;
-      setNotice("You are signed in successfully.");
+      router.replace("/dashboard");
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "We couldn't sign you in. Check your details and try again.");
     } finally {
