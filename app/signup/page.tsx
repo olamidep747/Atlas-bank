@@ -58,6 +58,8 @@ export default function SignupPage() {
   const [notice, setNotice] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [countryOpen, setCountryOpen] = useState(false);
+  const [countrySearch, setCountrySearch] = useState("");
 
   function updateDetail<K extends keyof SignupDetails>(key: K, value: SignupDetails[K]) {
     setDetails(previous => ({ ...previous, [key]: value }));
@@ -149,8 +151,7 @@ export default function SignupPage() {
 
   const passwordStrength = password.length === 0 ? 0 : password.length < 8 ? 1 : (/[A-Z]/.test(password) && /[a-z]/.test(password) && /[0-9]/.test(password) && /[^A-Za-z0-9]/.test(password)) ? 4 : (/[A-Za-z]/.test(password) && /[0-9]/.test(password)) ? 3 : 2;
   const passwordStrengthLabel = ["", "Weak", "Fair", "Good", "Strong"][passwordStrength];
-  const fieldStyle: React.CSSProperties = { width: "100%", boxSizing: "border-box" };
-  const gridStyle: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: "0 16px" };
+  const filteredCountries = ["European Union", ...countries].filter(country => country.toLowerCase().includes(countrySearch.toLowerCase()));
 
   return (
     <main className="login-page">
@@ -173,66 +174,43 @@ export default function SignupPage() {
           <h2>{codeSent ? "Verify your email." : "Create your account."}</h2>
           <p className="login-subtitle">{codeSent ? `Enter the six-digit code sent to ${email}.` : "Complete your details to open your ATLAS account."}</p>
           {!codeSent ? (
-            <form onSubmit={handleSignup}>
-              <label htmlFor="fullName">Full name</label>
-              <input style={fieldStyle} id="fullName" type="text" autoComplete="name" placeholder="Enter your full name" value={details.fullName} onChange={e=>updateDetail("fullName",e.target.value)} required/>
-
-              <div style={gridStyle}>
-                <div>
-                  <label htmlFor="dateOfBirth">Date of birth</label>
-                  <input style={fieldStyle} id="dateOfBirth" type="date" autoComplete="bday" value={details.dateOfBirth} onChange={e=>updateDetail("dateOfBirth",e.target.value)} required/>
+            <form className="atlas-signup-form" onSubmit={handleSignup}>
+              <section className="signup-group">
+                <div className="signup-group-heading"><span>01</span><div><h3>Personal information</h3><p>Tell us a little about yourself.</p></div></div>
+                <div className="signup-fields">
+                  <div className="signup-field signup-field-wide"><label htmlFor="fullName">Full name</label><input id="fullName" type="text" autoComplete="name" placeholder="Enter your full name" value={details.fullName} onChange={e=>updateDetail("fullName",e.target.value)} required/></div>
+                  <div className="signup-field"><label htmlFor="dateOfBirth">Date of birth</label><input id="dateOfBirth" type="date" autoComplete="bday" value={details.dateOfBirth} onChange={e=>updateDetail("dateOfBirth",e.target.value)} required/></div>
+                  <div className="signup-field"><label htmlFor="phone">Phone number</label><input id="phone" type="tel" autoComplete="tel" placeholder="+234..." value={details.phone} onChange={e=>updateDetail("phone",e.target.value)} required/></div>
+                  <div className="signup-field"><label htmlFor="gender">Gender</label><select id="gender" value={details.gender} onChange={e=>updateDetail("gender",e.target.value)} required><option value="">Select gender</option><option>Female</option><option>Male</option><option>Prefer not to say</option></select></div>
+                  <div className="signup-field"><label htmlFor="employmentStatus">Employment status</label><select id="employmentStatus" value={details.employmentStatus} onChange={e=>updateDetail("employmentStatus",e.target.value)} required><option value="">Select employment status</option><option>Employed</option><option>Self-employed</option><option>Unemployed</option><option>Student</option><option>Retired</option><option>Business owner</option></select></div>
                 </div>
-                <div>
-                  <label htmlFor="phone">Phone number</label>
-                  <input style={fieldStyle} id="phone" type="tel" autoComplete="tel" placeholder="+234..." value={details.phone} onChange={e=>updateDetail("phone",e.target.value)} required/>
+              </section>
+              <section className="signup-group">
+                <div className="signup-group-heading"><span>02</span><div><h3>Location</h3><p>Choose the country or region associated with your account.</p></div></div>
+                <div className="signup-fields">
+                  <div className="signup-field signup-field-wide country-picker">
+                    <label>Country or region</label>
+                    <button className="country-picker-trigger" type="button" aria-expanded={countryOpen} onClick={()=>{setCountryOpen(open=>!open);setCountrySearch("");}}><span className={details.country ? "selected" : "placeholder"}>{details.country || "Choose your country or region"}</span><span aria-hidden="true">⌄</span></button>
+                    {countryOpen && <div className="country-picker-panel"><input className="country-search" aria-label="Search countries" autoFocus placeholder="Search countries..." value={countrySearch} onChange={e=>setCountrySearch(e.target.value)}/><div className="country-picker-options">{filteredCountries.map(country=><button type="button" key={country} className={details.country===country?"active":""} onClick={()=>{updateDetail("country",country);setCountryOpen(false);setCountrySearch("");}}>{country}{country==="European Union" && <small>Regional option</small>}</button>)}{filteredCountries.length===0 && <p>No matching country found.</p>}</div></div>}
+                    <input type="text" tabIndex={-1} aria-hidden="true" value={details.country} required onChange={()=>{}} className="country-validation"/>
+                  </div>
                 </div>
-                <div>
-                  <label htmlFor="country">Country</label>
-                  <select style={fieldStyle} id="country" value={details.country} onChange={e=>updateDetail("country",e.target.value)} required>
-                    <option value="">Select your country</option>
-                    {countries.map(country=><option key={country} value={country}>{country}</option>)}
-                  </select>
+              </section>
+              <section className="signup-group">
+                <div className="signup-group-heading"><span>03</span><div><h3>Account preferences</h3><p>Select how you want your account set up.</p></div></div>
+                <div className="signup-fields">
+                  <div className="signup-field"><label htmlFor="accountType">Account type</label><select id="accountType" value={details.accountType} onChange={e=>updateDetail("accountType",e.target.value)} required><option value="">Select account type</option><option>Personal</option><option>Business</option><option>Savings</option><option>Current</option></select></div>
+                  <div className="signup-field"><label htmlFor="currency">Preferred currency</label><select id="currency" value={details.currency} onChange={e=>updateDetail("currency",e.target.value)} required>{currencies.map(([code,name])=><option key={code} value={code}>{code} — {name}</option>)}</select></div>
                 </div>
-                <div>
-                  <label htmlFor="gender">Gender</label>
-                  <select style={fieldStyle} id="gender" value={details.gender} onChange={e=>updateDetail("gender",e.target.value)} required>
-                    <option value="">Select gender</option><option>Female</option><option>Male</option><option>Prefer not to say</option>
-                  </select>
+              </section>
+              <section className="signup-group">
+                <div className="signup-group-heading"><span>04</span><div><h3>Sign-in details</h3><p>Use an email address you can access.</p></div></div>
+                <div className="signup-fields">
+                  <div className="signup-field signup-field-wide"><label htmlFor="email">Email address</label><input id="email" type="email" autoComplete="email" placeholder="you@example.com" value={email} onChange={e=>setEmail(e.target.value)} required/></div>
+                  <div className="signup-field"><label htmlFor="password">Create password</label><input id="password" type="password" autoComplete="new-password" placeholder="At least 8 characters" value={password} onChange={e=>setPassword(e.target.value)} required minLength={8}/>{password.length>0 && <div className="password-strength" aria-live="polite">Password strength: <strong>{passwordStrengthLabel}</strong><div><i style={{width:`${passwordStrength*25}%`,background:passwordStrength<2?"#ef4444":passwordStrength<4?"#eab308":"#16a34a"}}/></div></div>}</div>
+                  <div className="signup-field"><label htmlFor="confirmPassword">Confirm password</label><input id="confirmPassword" type="password" autoComplete="new-password" placeholder="Enter password again" value={confirmPassword} onChange={e=>setConfirmPassword(e.target.value)} required minLength={8}/>{confirmPassword.length>0 && <small className={password===confirmPassword?"password-match":"password-mismatch"}>{password===confirmPassword?"Passwords match":"Passwords do not match"}</small>}</div>
                 </div>
-                <div>
-                  <label htmlFor="employmentStatus">Employment status</label>
-                  <select style={fieldStyle} id="employmentStatus" value={details.employmentStatus} onChange={e=>updateDetail("employmentStatus",e.target.value)} required>
-                    <option value="">Select employment status</option>
-                    <option>Employed</option><option>Self-employed</option><option>Unemployed</option><option>Student</option><option>Retired</option><option>Business owner</option>
-                  </select>
-                </div>
-                <div>
-                  <label htmlFor="accountType">Account type</label>
-                  <select style={fieldStyle} id="accountType" value={details.accountType} onChange={e=>updateDetail("accountType",e.target.value)} required>
-                    <option value="">Select account type</option><option>Personal</option><option>Business</option><option>Savings</option><option>Current</option>
-                  </select>
-                </div>
-                <div>
-                  <label htmlFor="currency">Preferred currency</label>
-                  <select style={fieldStyle} id="currency" value={details.currency} onChange={e=>updateDetail("currency",e.target.value)} required>
-                    {currencies.map(([code,name])=><option key={code} value={code}>{code} — {name}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label htmlFor="email">Email address</label>
-                  <input style={fieldStyle} id="email" type="email" autoComplete="email" placeholder="you@example.com" value={email} onChange={e=>setEmail(e.target.value)} required/>
-                </div>
-                <div>
-                  <label htmlFor="password">Create password</label>
-                  <input style={fieldStyle} id="password" type="password" autoComplete="new-password" placeholder="At least 8 characters" value={password} onChange={e=>setPassword(e.target.value)} required minLength={8}/>
-                  {password.length > 0 && <div style={{marginTop:8,fontSize:12,color:"var(--muted, #64748b)"}} aria-live="polite">Password strength: <strong>{passwordStrengthLabel}</strong><div style={{height:5,background:"#e2e8f0",borderRadius:99,marginTop:6,overflow:"hidden"}}><div style={{height:"100%",width:`${passwordStrength * 25}%`,background:passwordStrength < 2 ? "#ef4444" : passwordStrength < 4 ? "#eab308" : "#16a34a",transition:"width .2s"}}/></div></div>}
-                </div>
-                <div>
-                  <label htmlFor="confirmPassword">Confirm password</label>
-                  <input style={fieldStyle} id="confirmPassword" type="password" autoComplete="new-password" placeholder="Enter your password again" value={confirmPassword} onChange={e=>setConfirmPassword(e.target.value)} required minLength={8}/>
-                  {confirmPassword.length > 0 && <p style={{fontSize:12,margin:"6px 0 0",color:password === confirmPassword ? "#16a34a" : "#dc2626"}}>{password === confirmPassword ? "Passwords match" : "Passwords do not match"}</p>}
-                </div>
-              </div>
+              </section>
               <button className="button button-gold login-submit" type="submit" disabled={loading}>{loading ? "Creating account..." : "Continue to verification"} <ArrowRight size={18}/></button>
             </form>
           ) : (
