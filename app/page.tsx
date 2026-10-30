@@ -26,7 +26,7 @@ export default function Home() {
         <div className="header-actions"><a className="signin" href="/login">Sign in</a><a className="button button-gold button-small" href="/signup">Open an account <ArrowUpRight size={16}/></a></div>
         <button className="mobile-menu" aria-label={menuOpen ? "Close menu" : "Open menu"} onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X/> : <Menu/>}</button>
       </header>
-      {menuOpen && <div className="mobile-panel">{links.map(x=><a key={x} href="#features" onClick={()=>setMenuOpen(false)}>{x}</a>)}<a href="/login" onClick={()=>setMenuOpen(false)}>Sign in</a><a className="button button-gold" href="/signup" onClick={()=>setMenuOpen(false)}>Open an account <ArrowRight size={16}/></a></div>}
+      <div className="mobile-panel" hidden={!menuOpen}>{links.map(x=><a key={x} href="#features" onClick={()=>setMenuOpen(false)}>{x}</a>)}<a href="/login" onClick={()=>setMenuOpen(false)}>Sign in</a><a className="button button-gold" href="/signup" onClick={()=>setMenuOpen(false)}>Open an account <ArrowRight size={16}/></a></div>
 
       <section className="hero">
         <div className="hero-glow glow-one"/><div className="hero-glow glow-two"/>
