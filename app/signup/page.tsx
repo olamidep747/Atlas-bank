@@ -67,7 +67,6 @@ export default function SignupPage() {
 
   async function handleSignup(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setLoading(true);
     setNotice("");
     setErrorMessage("");
     if (password !== confirmPassword) {
@@ -78,6 +77,7 @@ export default function SignupPage() {
       setErrorMessage("Your password must be at least 8 characters long.");
       return;
     }
+    setLoading(true);
     try {
       const { data, error } = await getSupabaseBrowserClient().auth.signUp({
         email: email.trim(),
