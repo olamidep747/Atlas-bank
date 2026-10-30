@@ -25,10 +25,16 @@ export default function SignupPage() {
         password,
       });
       if (error) throw error;
-      // Never treat a returned session as proof that the email was verified.
-      // Keep signup on the OTP screen until verifyOtp succeeds.
+
+      // A signup session must never leave the visitor logged in before the
+      // verification step. Clear any session Supabase unexpectedly returns.
+      if (data.session) {
+        const { error: signOutError } = await getSupabaseBrowserClient().auth.signOut();
+        if (signOutError) throw signOutError;
+      }
+
       setCodeSent(true);
-      setNotice("Your six-digit verification code has been requested. Check your inbox and enter it below to complete signup.");
+      setNotice("Enter the six-digit code sent to your email to finish creating your account.");
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "We couldn't create your account. Please try again.");
     } finally {
