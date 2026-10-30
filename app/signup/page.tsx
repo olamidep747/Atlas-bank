@@ -52,6 +52,7 @@ export default function SignupPage() {
   const [details, setDetails] = useState<SignupDetails>(emptyDetails);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [code, setCode] = useState("");
   const [codeSent, setCodeSent] = useState(false);
   const [notice, setNotice] = useState("");
@@ -67,6 +68,14 @@ export default function SignupPage() {
     setLoading(true);
     setNotice("");
     setErrorMessage("");
+    if (password !== confirmPassword) {
+      setErrorMessage("Your passwords do not match. Please enter them again.");
+      return;
+    }
+    if (password.length < 8) {
+      setErrorMessage("Your password must be at least 8 characters long.");
+      return;
+    }
     try {
       const { data, error } = await getSupabaseBrowserClient().auth.signUp({
         email: email.trim(),
@@ -138,6 +147,8 @@ export default function SignupPage() {
     }
   }
 
+  const passwordStrength = password.length === 0 ? 0 : password.length < 8 ? 1 : (/[A-Z]/.test(password) && /[a-z]/.test(password) && /[0-9]/.test(password) && /[^A-Za-z0-9]/.test(password)) ? 4 : (/[A-Za-z]/.test(password) && /[0-9]/.test(password)) ? 3 : 2;
+  const passwordStrengthLabel = ["", "Weak", "Fair", "Good", "Strong"][passwordStrength];
   const fieldStyle: React.CSSProperties = { width: "100%", boxSizing: "border-box" };
   const gridStyle: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: "0 16px" };
 
@@ -214,6 +225,12 @@ export default function SignupPage() {
                 <div>
                   <label htmlFor="password">Create password</label>
                   <input style={fieldStyle} id="password" type="password" autoComplete="new-password" placeholder="At least 8 characters" value={password} onChange={e=>setPassword(e.target.value)} required minLength={8}/>
+                  {password.length > 0 && <div style={{marginTop:8,fontSize:12,color:"var(--muted, #64748b)"}} aria-live="polite">Password strength: <strong>{passwordStrengthLabel}</strong><div style={{height:5,background:"#e2e8f0",borderRadius:99,marginTop:6,overflow:"hidden"}}><div style={{height:"100%",width:`${passwordStrength * 25}%`,background:passwordStrength < 2 ? "#ef4444" : passwordStrength < 4 ? "#eab308" : "#16a34a",transition:"width .2s"}}/></div></div>}
+                </div>
+                <div>
+                  <label htmlFor="confirmPassword">Confirm password</label>
+                  <input style={fieldStyle} id="confirmPassword" type="password" autoComplete="new-password" placeholder="Enter your password again" value={confirmPassword} onChange={e=>setConfirmPassword(e.target.value)} required minLength={8}/>
+                  {confirmPassword.length > 0 && <p style={{fontSize:12,margin:"6px 0 0",color:password === confirmPassword ? "#16a34a" : "#dc2626"}}>{password === confirmPassword ? "Passwords match" : "Passwords do not match"}</p>}
                 </div>
               </div>
               <button className="button button-gold login-submit" type="submit" disabled={loading}>{loading ? "Creating account..." : "Continue to verification"} <ArrowRight size={18}/></button>
