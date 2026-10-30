@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowDownLeft, ArrowUpRight, Bell, ChevronDown, CreditCard,
-  Headphones, Home, LogOut, Menu, Settings, ShieldCheck, Wallet, X
+  Headphones, Home, LogOut, Menu, Settings, ShieldCheck, Wallet, X, Banknote, LayoutGrid
 } from "lucide-react";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
@@ -82,12 +82,13 @@ export default function DashboardPage() {
 
         <div className="atlas-dash-section-heading"><div><span>YOUR MONEY</span><h3>Quick actions</h3></div></div>
         <section className="atlas-quick-actions" id="cards">
-          <div className="atlas-quick-action"><span><ArrowDownLeft size={20}/></span><div><b>Add money</b><small>Fund your account</small></div><ArrowUpRight size={17}/></div>
+          <div className="atlas-quick-action"><span><Banknote size={20}/></span><div><b>Withdraw</b><small>Withdraw funds</small></div><ArrowUpRight size={17}/></div>
           <div className="atlas-quick-action"><span><ArrowUpRight size={20}/></span><div><b>Transfer</b><small>Move money securely</small></div><ArrowUpRight size={17}/></div>
-          <div className="atlas-quick-action"><span><CreditCard size={20}/></span><div><b>Cards</b><small>Manage your cards</small></div><ArrowUpRight size={17}/></div>
+          <div className="atlas-quick-action"><span><ArrowDownLeft size={20}/></span><div><b>Add money</b><small>Fund your account</small></div><ArrowUpRight size={17}/></div>
         </section>
 
         <section className="atlas-dash-lower" id="support"><div className="atlas-dash-panel"><div className="atlas-dash-section-heading"><div><span>RECENT ACTIVITY</span><h3>Transactions</h3></div></div><div className="atlas-empty-state"><span><Wallet size={22}/></span><b>No transactions yet</b><p>Your account activity will appear here.</p></div></div><div className="atlas-dash-panel atlas-help-panel"><span className="atlas-help-icon"><Headphones size={22}/></span><h3>Need a hand?</h3><p>Our support team is here to help with your account.</p><a href="mailto:support@atlasbank.example">Contact support <ArrowUpRight size={15}/></a></div></section>
+        <nav className="atlas-mobile-bottom-nav" aria-label="Main navigation"><a className="is-active" href="/dashboard"><span><Home size={19}/></span><small>Home</small></a><a href="#accounts"><span><LayoutGrid size={19}/></span><small>Accounts</small></a><a href="#cards"><span><CreditCard size={19}/></span><small>Cards</small></a></nav>
         <footer className="atlas-dash-footer"><span>ATLAS BANK · YOUR FUTURE, OUR PRIORITY</span><span><ShieldCheck size={14}/> Keep your account details safe</span></footer>
       </section>
     </main>
