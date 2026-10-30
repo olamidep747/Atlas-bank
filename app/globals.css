@@ -48,3 +48,91 @@
 .password-match{color:#15935e}.password-mismatch{color:#dc2626}
 .atlas-signup-form .login-submit{margin-top:0}
 @media(max-width:700px){.login-form-wrap:has(.atlas-signup-form){max-width:100%}.atlas-signup-form{gap:15px}.signup-group{padding:17px 15px;border-radius:9px}.signup-fields{grid-template-columns:1fr;gap:14px}.signup-field-wide{grid-column:auto}.signup-group-heading{margin-bottom:16px}.country-picker-panel{max-height:300px}.country-picker-options{max-height:210px}}
+
+
+/* Customer dashboard — preserves the earlier navy, blue and gold account overview. */
+.atlas-dashboard{min-height:100vh;background:#f3f6fb;color:#102342;display:flex;font-family:'DM Sans',sans-serif}
+.atlas-side-nav{width:252px;flex:none;background:#081a38;color:#d5e1f2;padding:29px 17px 20px;display:flex;flex-direction:column;min-height:100vh;z-index:30}
+.atlas-dash-brand{display:flex;align-items:center;gap:10px;font:800 19px Manrope,sans-serif;letter-spacing:-.8px;padding:0 10px 42px;color:white}
+.atlas-dash-brand>span:last-child>span{color:#4a9aff;margin-left:3px}
+.atlas-dash-mark{width:34px;height:34px;border-radius:9px;background:#0066ff;display:grid;place-items:center;color:white;font:800 22px Manrope}
+.atlas-nav-label{font-size:8px;font-weight:700;letter-spacing:.18em;color:#7186a5;padding:0 12px 12px}
+.atlas-nav-label-spaced{margin-top:30px}
+.atlas-nav-link{height:46px;display:flex;align-items:center;gap:13px;padding:0 12px;border-radius:7px;color:#b6c6dc;font-size:12px;margin:2px 0}
+.atlas-nav-link svg{color:#8da6c9}
+.atlas-nav-link.active{background:#123b73;color:white}
+.atlas-nav-link.active svg{color:#ffd84d}
+.atlas-side-bottom{margin-top:auto}
+.atlas-side-security{display:flex;gap:11px;padding:15px 10px;border-top:1px solid #ffffff18;border-bottom:1px solid #ffffff18;margin-bottom:13px}
+.atlas-side-security>svg{color:#ffd84d;flex:none}
+.atlas-side-security b,.atlas-side-security small{display:block}
+.atlas-side-security b{font-size:10px;color:#e5edf8}
+.atlas-side-security small{font-size:9px;color:#8499b8;line-height:1.5;margin-top:4px}
+.atlas-signout{width:100%;border:0;background:none;text-align:left;cursor:pointer}
+.atlas-signout:hover{background:#ffffff10;color:white}
+.atlas-dash-main{min-width:0;flex:1;padding:0 4.5%;max-width:1600px;margin:0 auto}
+.atlas-dash-header{min-height:91px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e1e8f1}
+.atlas-dash-overline,.atlas-dash-section-heading>div>span{display:block;font-size:8px;font-weight:700;letter-spacing:.17em;color:#7185a0}
+.atlas-dash-header h1{font:700 19px Manrope;margin:5px 0 0;color:#0a1f44}
+.atlas-dash-header-right{display:flex;align-items:center;gap:22px}
+.atlas-notification{width:37px;height:37px;border:1px solid #e0e7f0;background:white;color:#536781;border-radius:50%;display:grid;place-items:center}
+.atlas-user-chip{display:flex;align-items:center;gap:10px}
+.atlas-user-chip>span{width:34px;height:34px;border-radius:50%;background:#dceaff;color:#0066ff;display:grid;place-items:center;font-weight:700;font-size:12px}
+.atlas-user-chip b,.atlas-user-chip small{display:block}
+.atlas-user-chip b{font-size:10px;color:#203653}
+.atlas-user-chip small{font-size:9px;color:#8795a8;margin-top:3px;max-width:160px;overflow:hidden;text-overflow:ellipsis}
+.atlas-user-chip>svg{color:#8493a7}
+.atlas-dash-menu-button{display:none}
+.atlas-dash-welcome{display:flex;align-items:end;justify-content:space-between;padding:31px 0 24px}
+.atlas-dash-welcome p{font-size:8px;font-weight:700;letter-spacing:.17em;color:#0066ff;margin:0 0 8px}
+.atlas-dash-welcome h2{font:800 27px Manrope;letter-spacing:-.04em;color:#0a1f44;margin:0 0 6px}
+.atlas-dash-welcome>div>span{font-size:11px;color:#7b8ba0}
+.atlas-dash-date{display:flex;align-items:center;gap:7px;color:#64809e;font-size:9px;padding-bottom:4px}
+.atlas-dash-date svg{color:#0d9b70}
+.atlas-savings-card{position:relative;overflow:hidden;background:linear-gradient(115deg,#0a1f44 0%,#0c3470 65%,#0759b9 100%);border-radius:13px;color:white;padding:25px 28px 19px;box-shadow:0 14px 32px #0a1f4420}
+.atlas-savings-card:after{content:"";position:absolute;width:320px;height:320px;border:1px solid #ffffff15;border-radius:50%;right:-100px;top:-190px;box-shadow:0 0 0 35px #ffffff08,0 0 0 75px #ffffff06}
+.atlas-savings-card-top{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1}
+.atlas-savings-icon{width:41px;height:41px;border-radius:10px;background:#ffffff18;color:#ffd84d;display:grid;place-items:center}
+.atlas-account-status{display:flex;align-items:center;gap:7px;font-size:8px;letter-spacing:.14em;color:#c6d8f0}
+.atlas-account-status i{width:6px;height:6px;border-radius:50%;background:#52d5a0}
+.atlas-savings-label{font:700 20px Manrope;margin-top:22px;position:relative;z-index:1}
+.atlas-savings-currency{font-size:10px;color:#c5d7ee;margin-top:6px;position:relative;z-index:1}
+.atlas-savings-currency span{color:#91afd5}
+.atlas-savings-divider{height:1px;background:#ffffff25;margin:22px 0 16px;position:relative;z-index:1}
+.atlas-savings-bottom{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;position:relative;z-index:1}
+.atlas-savings-bottom small,.atlas-savings-bottom strong{display:block}
+.atlas-savings-bottom small{font-size:9px;color:#b4c9e4;margin-bottom:7px}
+.atlas-savings-bottom strong{font:700 17px Manrope;color:#fff}
+.atlas-savings-account strong{font-size:12px}
+.atlas-savings-footnote{font-size:9px;color:#a9c0df;margin-top:17px;position:relative;z-index:1}
+.atlas-dash-section-heading{display:flex;align-items:end;justify-content:space-between;margin:31px 0 15px}
+.atlas-dash-section-heading h3{font:700 17px Manrope;color:#0a1f44;margin:5px 0 0}
+.atlas-quick-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+.atlas-quick-action{min-height:76px;background:#fff;border:1px solid #e5ebf3;border-radius:9px;display:flex;align-items:center;gap:12px;padding:14px;box-shadow:0 4px 14px #0a1f4405}
+.atlas-quick-action>span{width:38px;height:38px;border-radius:9px;background:#edf4ff;color:#0066ff;display:grid;place-items:center}
+.atlas-quick-action>div{flex:1;min-width:0}
+.atlas-quick-action b,.atlas-quick-action small{display:block}
+.atlas-quick-action b{font-size:11px;color:#1c3454}
+.atlas-quick-action small{font-size:9px;color:#8997a9;margin-top:4px}
+.atlas-quick-action>svg{color:#8ca0ba}
+.atlas-dash-lower{display:grid;grid-template-columns:1.6fr 1fr;gap:14px;margin-top:25px}
+.atlas-dash-panel{background:white;border:1px solid #e5ebf3;border-radius:9px;padding:18px 20px;min-height:190px}
+.atlas-dash-panel .atlas-dash-section-heading{margin:0}
+.atlas-empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:23px 10px 8px}
+.atlas-empty-state>span{width:37px;height:37px;border-radius:50%;background:#edf4ff;color:#0066ff;display:grid;place-items:center;margin-bottom:9px}
+.atlas-empty-state b{font-size:11px;color:#344966}
+.atlas-empty-state p{font-size:9px;color:#8a98aa;margin:5px 0}
+.atlas-help-panel{background:#fffdf5;border-color:#f3e9c6}
+.atlas-help-icon{width:37px;height:37px;background:#fff2c2;color:#987500;border-radius:9px;display:grid;place-items:center}
+.atlas-help-panel h3{font:700 15px Manrope;margin:12px 0 6px;color:#1a3150}
+.atlas-help-panel p{font-size:10px;line-height:1.6;color:#77869a;margin:0 0 10px}
+.atlas-help-panel a{font-size:10px;font-weight:700;color:#0066ff;display:flex;align-items:center;gap:5px}
+.atlas-dash-footer{display:flex;justify-content:space-between;gap:12px;padding:26px 0;color:#8a99ad;font-size:8px;letter-spacing:.09em}
+.atlas-dash-footer span:last-child{display:flex;align-items:center;gap:6px;letter-spacing:0}
+.atlas-dash-footer svg{color:#0d9b70}
+.atlas-dashboard-loading{min-height:100vh;background:#f3f6fb;display:flex;align-items:center;justify-content:center;gap:12px;color:#526781;font-size:13px}
+.atlas-spinner{width:19px;height:19px;border:2px solid #d6e3f5;border-top-color:#0066ff;border-radius:50%;animation:atlas-spin .7s linear infinite}
+@keyframes atlas-spin{to{transform:rotate(360deg)}}
+.atlas-dash-scrim{display:none}
+@media(max-width:760px){.atlas-side-nav{position:fixed;left:0;top:0;bottom:0;width:270px;min-height:100dvh;transform:translateX(-105%);transition:transform .22s ease;box-shadow:15px 0 40px #06152f30}.atlas-side-nav.is-open{transform:translateX(0)}.atlas-dash-scrim{display:block;position:fixed;inset:0;background:#06152f75;border:0;z-index:25}.atlas-dash-main{width:100%;padding:0 5%}.atlas-dash-header{min-height:76px;gap:12px}.atlas-dash-menu-button{display:grid;place-items:center;width:36px;height:36px;border:1px solid #e0e7f0;border-radius:7px;background:#fff;color:#163354;flex:none}.atlas-dash-header>div:first-of-type{flex:1}.atlas-dash-header h1{font-size:16px}.atlas-dash-header-right{gap:10px}.atlas-notification{width:33px;height:33px}.atlas-user-chip{gap:0}.atlas-user-chip>div,.atlas-user-chip>svg{display:none}.atlas-user-chip>span{width:32px;height:32px}.atlas-dash-welcome{padding:26px 0 20px;align-items:start}.atlas-dash-welcome h2{font-size:22px}.atlas-dash-date{font-size:0}.atlas-dash-date svg{width:18px}.atlas-savings-card{padding:21px 18px 17px}.atlas-savings-label{font-size:18px}.atlas-savings-bottom{gap:8px}.atlas-savings-bottom strong{font-size:14px}.atlas-savings-bottom small{font-size:8px}.atlas-savings-account strong{font-size:10px}.atlas-quick-actions{grid-template-columns:1fr;gap:9px}.atlas-quick-action{min-height:65px}.atlas-dash-lower{grid-template-columns:1fr}.atlas-dash-footer{flex-direction:column}.atlas-dash-section-heading{margin-top:26px}}
+@media(prefers-reduced-motion:reduce){.atlas-spinner{animation:none}.atlas-side-nav{transition:none}}
