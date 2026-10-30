@@ -26,10 +26,10 @@ export default function SignupPage() {
       });
       if (error) throw error;
       if (data.session) {
-        setNotice("Your account has been created and you are signed in.");
+        setNotice("Your account has been created and your email is verified.");
       } else {
         setCodeSent(true);
-        setNotice("Your six-digit verification code has been sent to your email. Enter it below to finish creating your account.");
+        setNotice("A verification email has been requested. Enter the six-digit code from your inbox to finish creating your account.");
       }
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "We couldn't create your account. Please try again.");
@@ -50,9 +50,27 @@ export default function SignupPage() {
         type: "signup",
       });
       if (error) throw error;
-      setNotice("Your email is verified and your ATLAS account is created.");
+      setNotice("Your email is verified and your ATLAS account is created. You can now sign in.");
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "That code couldn't be verified. Please check it and try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleResend() {
+    setLoading(true);
+    setNotice("");
+    setErrorMessage("");
+    try {
+      const { error } = await getSupabaseBrowserClient().auth.resend({
+        type: "signup",
+        email: email.trim(),
+      });
+      if (error) throw error;
+      setNotice("A new verification code has been requested. Check your inbox and spam folder.");
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "We couldn't resend the code. Please wait a moment and try again.");
     } finally {
       setLoading(false);
     }
@@ -87,11 +105,14 @@ export default function SignupPage() {
               <button className="button button-gold login-submit" type="submit" disabled={loading}>{loading ? "Creating account..." : "Sign up"} <ArrowRight size={18}/></button>
             </form>
           ) : (
-            <form onSubmit={handleVerify}>
-              <label htmlFor="code">Six-digit verification code</label>
-              <input id="code" type="text" inputMode="numeric" autoComplete="one-time-code" placeholder="000000" value={code} onChange={e=>setCode(e.target.value.replace(/\\D/g, "").slice(0, 6))} required minLength={6} maxLength={6}/>
-              <button className="button button-gold login-submit" type="submit" disabled={loading || code.length !== 6}>{loading ? "Verifying..." : "Verify email"} <ArrowRight size={18}/></button>
-            </form>
+            <>
+              <form onSubmit={handleVerify}>
+                <label htmlFor="code">Six-digit verification code</label>
+                <input id="code" type="text" inputMode="numeric" autoComplete="one-time-code" placeholder="000000" value={code} onChange={e=>setCode(e.target.value.replace(/\D/g, "").slice(0, 6))} required minLength={6} maxLength={6}/>
+                <button className="button button-gold login-submit" type="submit" disabled={loading || code.length !== 6}>{loading ? "Verifying..." : "Verify email"} <ArrowRight size={18}/></button>
+              </form>
+              <button className="login-resend" type="button" onClick={handleResend} disabled={loading}>Didn't receive a code? Resend email</button>
+            </>
           )}
           {notice && <p className="login-notice" role="status">{notice}</p>}
           {errorMessage && <p className="login-notice" role="alert">{errorMessage}</p>}
