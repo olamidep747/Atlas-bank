@@ -136,3 +136,23 @@
 .atlas-dash-scrim{display:none}
 @media(max-width:760px){.atlas-side-nav{position:fixed;left:0;top:0;bottom:0;width:270px;min-height:100dvh;transform:translateX(-105%);transition:transform .22s ease;box-shadow:15px 0 40px #06152f30}.atlas-side-nav.is-open{transform:translateX(0)}.atlas-dash-scrim{display:block;position:fixed;inset:0;background:#06152f75;border:0;z-index:25}.atlas-dash-main{width:100%;padding:0 5%}.atlas-dash-header{min-height:76px;gap:12px}.atlas-dash-menu-button{display:grid;place-items:center;width:36px;height:36px;border:1px solid #e0e7f0;border-radius:7px;background:#fff;color:#163354;flex:none}.atlas-dash-header>div:first-of-type{flex:1}.atlas-dash-header h1{font-size:16px}.atlas-dash-header-right{gap:10px}.atlas-notification{width:33px;height:33px}.atlas-user-chip{gap:0}.atlas-user-chip>div,.atlas-user-chip>svg{display:none}.atlas-user-chip>span{width:32px;height:32px}.atlas-dash-welcome{padding:26px 0 20px;align-items:start}.atlas-dash-welcome h2{font-size:22px}.atlas-dash-date{font-size:0}.atlas-dash-date svg{width:18px}.atlas-savings-card{padding:21px 18px 17px}.atlas-savings-label{font-size:18px}.atlas-savings-bottom{gap:8px}.atlas-savings-bottom strong{font-size:14px}.atlas-savings-bottom small{font-size:8px}.atlas-savings-account strong{font-size:10px}.atlas-quick-actions{grid-template-columns:1fr;gap:9px}.atlas-quick-action{min-height:65px}.atlas-dash-lower{grid-template-columns:1fr}.atlas-dash-footer{flex-direction:column}.atlas-dash-section-heading{margin-top:26px}}
 @media(prefers-reduced-motion:reduce){.atlas-spinner{animation:none}.atlas-side-nav{transition:none}}
+
+
+/* Mobile customer navigation: three round icon destinations and room for safe scrolling. */
+.atlas-mobile-bottom-nav{display:none}
+@media(max-width:760px){
+  .atlas-dash-main{padding-bottom:104px}
+  .atlas-mobile-bottom-nav{position:fixed;display:flex;align-items:center;justify-content:space-around;left:50%;bottom:max(12px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(360px,calc(100% - 34px));height:72px;padding:7px 14px;background:#fff;border:1px solid #e3eaf3;border-radius:22px;box-shadow:0 12px 35px #0a1f4426;z-index:20}
+  .atlas-mobile-bottom-nav a{display:flex;flex:1;flex-direction:column;align-items:center;justify-content:center;gap:5px;color:#8190a5;text-decoration:none}
+  .atlas-mobile-bottom-nav a span{width:37px;height:37px;border-radius:50%;display:grid;place-items:center;background:#f1f5fa;color:#61758f}
+  .atlas-mobile-bottom-nav a small{font-size:9px;font-weight:700}
+  .atlas-mobile-bottom-nav a.is-active{color:#0066ff}
+  .atlas-mobile-bottom-nav a.is-active span{background:#e8f1ff;color:#0066ff;box-shadow:inset 0 0 0 1px #d4e5ff}
+  .atlas-quick-actions{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .atlas-quick-action{min-height:105px;flex-direction:column;align-items:flex-start;justify-content:center;gap:8px;padding:11px 9px;border-radius:12px}
+  .atlas-quick-action>span{width:34px;height:34px;border-radius:10px}
+  .atlas-quick-action>div{flex:none}
+  .atlas-quick-action b{font-size:10px}
+  .atlas-quick-action small{font-size:8px;white-space:normal}
+  .atlas-quick-action>svg{display:none}
+}
