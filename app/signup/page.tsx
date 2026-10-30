@@ -25,12 +25,10 @@ export default function SignupPage() {
         password,
       });
       if (error) throw error;
-      if (data.session) {
-        setNotice("Your account has been created and your email is verified.");
-      } else {
-        setCodeSent(true);
-        setNotice("A verification email has been requested. Enter the six-digit code from your inbox to finish creating your account.");
-      }
+      // Never treat a returned session as proof that the email was verified.
+      // Keep signup on the OTP screen until verifyOtp succeeds.
+      setCodeSent(true);
+      setNotice("Your six-digit verification code has been requested. Check your inbox and enter it below to complete signup.");
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "We couldn't create your account. Please try again.");
     } finally {
