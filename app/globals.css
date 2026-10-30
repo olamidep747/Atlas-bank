@@ -12,3 +12,39 @@
 
 /* Public homepage menu must remain closed until explicitly opened. */
 .mobile-panel[hidden]{display:none!important}
+
+
+/* ATLAS signup: calm, grouped layout with generous spacing */
+.login-form-wrap:has(.atlas-signup-form){max-width:680px}
+.atlas-signup-form{display:flex;flex-direction:column;gap:25px}
+.signup-group{background:#fff;border:1px solid #e3e9f1;border-radius:12px;padding:22px 24px;box-shadow:0 5px 18px #0a1f4407}
+.signup-group-heading{display:flex;align-items:flex-start;gap:13px;margin-bottom:19px}
+.signup-group-heading>span{width:29px;height:29px;flex:none;border-radius:8px;background:#edf4ff;color:#0066ff;display:grid;place-items:center;font:700 10px Manrope}
+.signup-group-heading h3{font:700 14px Manrope;color:#102342;margin:1px 0 5px}
+.signup-group-heading p{font-size:11px;color:#8290a3;margin:0;line-height:1.5}
+.signup-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px 15px}
+.signup-field{min-width:0;position:relative}
+.signup-field-wide{grid-column:1/-1}
+.signup-field>label{display:block;font-size:11px;font-weight:700;color:#1a2d49;margin:0 0 8px}
+.signup-field input,.signup-field select,.country-picker-trigger{width:100%;height:47px;border:1px solid #dce4ef;background:#fff;border-radius:6px;padding:0 13px;color:#102342;font:12px 'DM Sans',sans-serif;outline:none;transition:border .2s,box-shadow .2s}
+.signup-field input:focus,.signup-field select:focus,.country-picker-trigger:focus{border-color:#0066ff;box-shadow:0 0 0 3px #0066ff12}
+.signup-field input::placeholder{color:#a5afbd}
+.signup-field select{cursor:pointer}
+.country-picker-trigger{display:flex;align-items:center;justify-content:space-between;text-align:left;cursor:pointer}
+.country-picker-trigger .placeholder{color:#a5afbd}
+.country-picker-trigger>span:last-child{font-size:18px;color:#64748b}
+.country-picker-panel{position:absolute;z-index:20;top:calc(100% + 7px);left:0;right:0;background:white;border:1px solid #dce4ef;border-radius:9px;padding:10px;box-shadow:0 18px 45px #0a1f4424}
+.country-picker-panel .country-search{height:42px;margin-bottom:8px}
+.country-picker-options{max-height:230px;overflow:auto}
+.country-picker-options button{width:100%;min-height:39px;border:0;border-radius:5px;background:white;text-align:left;padding:8px 10px;color:#263b59;font:12px 'DM Sans',sans-serif;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.country-picker-options button:hover,.country-picker-options button.active{background:#edf4ff;color:#005ce6}
+.country-picker-options button small{font-size:9px;color:#71839b}
+.country-picker-options p{font-size:11px;color:#8290a3;padding:8px}
+.country-validation{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important;bottom:0;left:0}
+.password-strength{font-size:10px;color:#74839a;margin-top:8px}
+.password-strength>div{height:4px;background:#e5eaf1;border-radius:20px;overflow:hidden;margin-top:6px}
+.password-strength i{display:block;height:100%;border-radius:20px;transition:width .2s}
+.password-match,.password-mismatch{display:block;font-size:10px;margin-top:7px}
+.password-match{color:#15935e}.password-mismatch{color:#dc2626}
+.atlas-signup-form .login-submit{margin-top:0}
+@media(max-width:700px){.login-form-wrap:has(.atlas-signup-form){max-width:100%}.atlas-signup-form{gap:15px}.signup-group{padding:17px 15px;border-radius:9px}.signup-fields{grid-template-columns:1fr;gap:14px}.signup-field-wide{grid-column:auto}.signup-group-heading{margin-bottom:16px}.country-picker-panel{max-height:300px}.country-picker-options{max-height:210px}}
