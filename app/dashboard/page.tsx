@@ -20,6 +20,7 @@ export default function DashboardPage() {
   const [accountCopied, setAccountCopied] = useState(false);
   const [balance, setBalance] = useState("0.00");
   const [currency, setCurrency] = useState("USD");
+  const currencyDisplay = currency === "EUR" ? "€" : currency;
   const [activeAction, setActiveAction] = useState<"withdraw" | "transfer" | "deposit" | null>(null);
 
   useEffect(() => {
@@ -103,9 +104,9 @@ export default function DashboardPage() {
         <section className="atlas-savings-card" id="accounts">
           <div className="atlas-savings-card-top"><div className="atlas-savings-icon"><Wallet size={21}/></div><span className="atlas-account-status"><i/> ACCOUNT OVERVIEW</span></div>
           <div className="atlas-savings-label">Savings Account</div>
-          <div className="atlas-savings-currency">{currency} <span>· {currency === "USD" ? "US Dollar" : currency} account</span></div>
+          <div className="atlas-savings-currency">{currencyDisplay} <span>· {currency === "EUR" ? "Euro" : currency === "USD" ? "US Dollar" : currency} account</span></div>
           <div className="atlas-savings-divider"/>
-          <div className="atlas-savings-bottom"><div><small>Account balance</small><strong>{currency} {balance}</strong></div><div><small>Account number</small>{accountNumber ? <button type="button" className="atlas-copy-account-number" onClick={copyAccountNumber} aria-label="Copy account number"><strong>{accountNumber}</strong>{accountCopied ? <Check size={15}/> : <Copy size={15}/>}<span>{accountCopied ? "Copied" : "Tap to copy"}</span></button> : <strong>Being assigned</strong>}</div><div className="atlas-savings-account"><small>Account holder</small><strong>{name}</strong></div></div>
+          <div className="atlas-savings-bottom"><div><small>Account balance</small><strong>{currencyDisplay} {balance}</strong></div><div><small>Account number</small>{accountNumber ? <button type="button" className="atlas-copy-account-number" onClick={copyAccountNumber} aria-label="Copy account number"><strong>{accountNumber}</strong>{accountCopied ? <Check size={15}/> : <Copy size={15}/>}<span>{accountCopied ? "Copied" : "Tap to copy"}</span></button> : <strong>Being assigned</strong>}</div><div className="atlas-savings-account"><small>Account holder</small><strong>{name}</strong></div></div>
           <div className="atlas-savings-footnote">Your account number is permanently assigned and linked to your profile.</div>
         </section>
 
@@ -117,7 +118,7 @@ export default function DashboardPage() {
                 <button type="button" onClick={() => setActiveAction(null)} aria-label="Close" className="rounded-full bg-slate-100 p-2 text-slate-600 hover:bg-slate-200"><X size={19}/></button>
               </div>
               <p className="mt-3 text-sm leading-6 text-slate-600">{activeAction === "withdraw" ? "The withdrawal area is ready to be configured. We’ll add the destination and verification steps next." : activeAction === "transfer" ? "The transfer area is ready to be configured. We’ll add recipient details and confirmation steps next." : "The deposit area is ready to be configured. We’ll add the available funding methods next."}</p>
-              <div className="mt-5 rounded-2xl bg-slate-50 p-4"><div className="text-xs font-medium uppercase tracking-wide text-slate-500">Current account</div><div className="mt-1 font-semibold text-slate-900">{currency} {balance}</div><div className="mt-1 text-xs text-slate-500">Account {accountNumber || "number pending"}</div></div>
+              <div className="mt-5 rounded-2xl bg-slate-50 p-4"><div className="text-xs font-medium uppercase tracking-wide text-slate-500">Current account</div><div className="mt-1 font-semibold text-slate-900">{currencyDisplay} {balance}</div><div className="mt-1 text-xs text-slate-500">Account {accountNumber || "number pending"}</div></div>
               <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs leading-5 text-amber-900">This is an interface preview. No deposit, withdrawal, or transfer will be submitted or processed from this screen yet.</div>
               <button type="button" onClick={() => setActiveAction(null)} className="mt-5 w-full rounded-xl bg-[#15264b] px-4 py-3 font-semibold text-white hover:bg-[#20365f]">Close</button>
             </section>
