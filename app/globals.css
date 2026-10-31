@@ -187,3 +187,11 @@
 .atlas-copy-account-number svg{color:#d5b34d;flex:none}
 .atlas-copy-account-number span{font-size:10px;font-weight:650;color:#d5b34d}
 .atlas-copy-account-number:focus-visible{outline:2px solid #d5b34d;outline-offset:4px;border-radius:4px}
+
+
+.atlas-chat-typing{display:inline-flex;align-items:center;gap:3px;padding:7px 10px;border-radius:14px;background:#e7edf6}
+.atlas-chat-typing i{display:block;width:5px;height:5px;border-radius:50%;background:#6683a8;animation:atlas-chat-dot 1s infinite ease-in-out}
+.atlas-chat-typing i:nth-child(2){animation-delay:.15s}
+.atlas-chat-typing i:nth-child(3){animation-delay:.3s}
+@keyframes atlas-chat-dot{0%,60%,100%{transform:translateY(0);opacity:.55}30%{transform:translateY(-4px);opacity:1}}
+@media(prefers-reduced-motion:reduce){.atlas-chat-typing i{animation:none}}
