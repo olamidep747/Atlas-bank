@@ -1,5 +1,1 @@
-import SupportChat from "@/app/components/SupportChat";
-
-export default function SupportPage() {
-  return <SupportChat mode="customer" />;
-}
+import { redirect } from "next/navigation";\n\nexport default function SupportPage() {\n  redirect("/dashboard");\n}\n
