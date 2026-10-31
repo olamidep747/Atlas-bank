@@ -26,7 +26,9 @@ export default function LoginPage() {
         password,
       });
       if (error) throw error;
-      router.replace("/dashboard");
+      // Admins are identified by the protected server-side admin RPC; no public admin link is needed.
+      const { error: adminCheckError } = await getSupabaseBrowserClient().rpc("novexxa_admin_list_accounts");
+      router.replace(adminCheckError ? "/dashboard" : "/admin");
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "We couldn't sign you in. Check your details and try again.");
     } finally {
