@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
-import { Paperclip, Send, Headphones, MessageCircle, FileText, Image as ImageIcon, Check, CheckCheck, Loader2, X } from "lucide-react";
+import { Paperclip, Send, Headphones, MessageCircle, FileText, Check, CheckCheck, Loader2, X } from "lucide-react";
 
 type ChatMode = "customer" | "admin";
 type Conversation = { conversation_id: string; user_id: string; display_name?: string; customer_email?: string; account_number?: string; last_message?: string; last_message_at?: string; status?: string };
@@ -19,7 +19,6 @@ export default function SupportChat({ mode }: { mode: ChatMode }) {
   const [files, setFiles] = useState<File[]>([]);
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [typing, setTyping] = useState(false);
   const [otherTyping, setOtherTyping] = useState(false);
   const [error, setError] = useState("");
   const [expanded, setExpanded] = useState(mode === "admin");
