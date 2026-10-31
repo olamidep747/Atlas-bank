@@ -119,7 +119,7 @@ export default function SupportChat({ mode }: { mode: ChatMode }) {
     for (const file of files) {
       if (file.size > 15 * 1024 * 1024) throw new Error(file.name + " exceeds the 15 MB limit.");
       const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-      const path = userId + "/" + conversationId + "/" + crypto.randomUUID() + "-" + safeName;
+      const attachmentOwnerId = mode === "admin" ? conversations.find(item => item.conversation_id === conversationId)?.user_id : userId;\n      if (!attachmentOwnerId) throw new Error("Could not identify the customer account for this attachment.");\n      const path = attachmentOwnerId + "/" + conversationId + "/" + crypto.randomUUID() + "-" + safeName;
       const { error: uploadError } = await supabase.storage.from("atlas-support-files").upload(path, file, { contentType: file.type, upsert: false });
       if (uploadError) throw uploadError;
       paths.push(path);
