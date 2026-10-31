@@ -17,6 +17,7 @@ export default function DashboardPage() {
   const [accountNumber, setAccountNumber] = useState("");
   const [balance, setBalance] = useState("0.00");
   const [currency, setCurrency] = useState("USD");
+  const [activeAction, setActiveAction] = useState<"withdraw" | "transfer" | "deposit" | null>(null);
 
   useEffect(() => {
     const supabase = getSupabaseBrowserClient();
@@ -97,10 +98,25 @@ export default function DashboardPage() {
 
         <div className="atlas-dash-section-heading"><div><span>YOUR MONEY</span><h3>Quick actions</h3></div></div>
         <section className="atlas-quick-actions" id="cards">
-          <div className="atlas-quick-action"><span><Banknote size={20}/></span><div><b>Withdraw</b><small>Withdraw funds</small></div><ArrowUpRight size={17}/></div>
-          <div className="atlas-quick-action"><span><ArrowUpRight size={20}/></span><div><b>Transfer</b><small>Move money securely</small></div><ArrowUpRight size={17}/></div>
-          <div className="atlas-quick-action"><span><ArrowDownLeft size={20}/></span><div><b>Add money</b><small>Fund your account</small></div><ArrowUpRight size={17}/></div>
+          <button type="button" className="atlas-quick-action" onClick={() => setActiveAction("withdraw")}><span><Banknote size={20}/></span><div><b>Withdraw</b><small>Withdraw funds</small></div><ArrowUpRight size={17}/></button>
+          <button type="button" className="atlas-quick-action" onClick={() => setActiveAction("transfer")}><span><ArrowUpRight size={20}/></span><div><b>Transfer</b><small>Move money securely</small></div><ArrowUpRight size={17}/></button>
+          <button type="button" className="atlas-quick-action" onClick={() => setActiveAction("deposit")}><span><ArrowDownLeft size={20}/></span><div><b>Deposit</b><small>Add money to your account</small></div><ArrowUpRight size={17}/></button>
         </section>
+
+        {activeAction && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#071126]/70 p-4" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setActiveAction(null); }}>
+            <section role="dialog" aria-modal="true" aria-labelledby="action-dialog-title" className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl">
+              <div className="flex items-start justify-between gap-4">
+                <div><p className="text-xs font-bold uppercase tracking-[.18em] text-blue-700">ATLAS ACCOUNT SERVICES</p><h2 id="action-dialog-title" className="mt-2 text-2xl font-bold text-slate-900">{activeAction === "withdraw" ? "Withdraw funds" : activeAction === "transfer" ? "Transfer funds" : "Deposit funds"}</h2></div>
+                <button type="button" onClick={() => setActiveAction(null)} aria-label="Close" className="rounded-full bg-slate-100 p-2 text-slate-600 hover:bg-slate-200"><X size={19}/></button>
+              </div>
+              <p className="mt-3 text-sm leading-6 text-slate-600">{activeAction === "withdraw" ? "The withdrawal area is ready to be configured. We’ll add the destination and verification steps next." : activeAction === "transfer" ? "The transfer area is ready to be configured. We’ll add recipient details and confirmation steps next." : "The deposit area is ready to be configured. We’ll add the available funding methods next."}</p>
+              <div className="mt-5 rounded-2xl bg-slate-50 p-4"><div className="text-xs font-medium uppercase tracking-wide text-slate-500">Current account</div><div className="mt-1 font-semibold text-slate-900">{currency} {balance}</div><div className="mt-1 text-xs text-slate-500">Account {accountNumber || "number pending"}</div></div>
+              <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs leading-5 text-amber-900">This is an interface preview. No deposit, withdrawal, or transfer will be submitted or processed from this screen yet.</div>
+              <button type="button" onClick={() => setActiveAction(null)} className="mt-5 w-full rounded-xl bg-[#15264b] px-4 py-3 font-semibold text-white hover:bg-[#20365f]">Close</button>
+            </section>
+          </div>
+        )}
 
         <section className="atlas-dash-lower" id="support"><div className="atlas-dash-panel"><div className="atlas-dash-section-heading"><div><span>RECENT ACTIVITY</span><h3>Transactions</h3></div></div><div className="atlas-empty-state"><span><Wallet size={22}/></span><b>No transactions yet</b><p>Your account activity will appear here.</p></div></div><div className="atlas-dash-panel atlas-help-panel"><span className="atlas-help-icon"><Headphones size={22}/></span><h3>Need a hand?</h3><p>Our support team is here to help with your account.</p><a href="mailto:support@atlasbank.example">Contact support <ArrowUpRight size={15}/></a></div></section>
         <nav className="atlas-mobile-bottom-nav" aria-label="Main navigation"><a className="is-active" href="/dashboard"><span><Home size={19}/></span><small>Home</small></a><a href="#accounts"><span><LayoutGrid size={19}/></span><small>Accounts</small></a><a href="#cards"><span><CreditCard size={19}/></span><small>Cards</small></a></nav>
