@@ -20,7 +20,8 @@ export default function DashboardPage() {
   const [accountCopied, setAccountCopied] = useState(false);
   const [balance, setBalance] = useState("0.00");
   const [currency, setCurrency] = useState("USD");
-  const currencyDisplay = currency === "EUR" ? "€" : currency;
+  const normalizedCurrency = String(currency ?? "USD").trim().toUpperCase();
+  const currencyDisplay = normalizedCurrency === "EUR" ? "€" : normalizedCurrency;
   const [activeAction, setActiveAction] = useState<"withdraw" | "transfer" | "deposit" | null>(null);
 
   useEffect(() => {
@@ -104,7 +105,7 @@ export default function DashboardPage() {
         <section className="atlas-savings-card" id="accounts">
           <div className="atlas-savings-card-top"><div className="atlas-savings-icon"><Wallet size={21}/></div><span className="atlas-account-status"><i/> ACCOUNT OVERVIEW</span></div>
           <div className="atlas-savings-label">Savings Account</div>
-          <div className="atlas-savings-currency">{currencyDisplay} <span>· {currency === "EUR" ? "Euro" : currency === "USD" ? "US Dollar" : currency} account</span></div>
+          <div className="atlas-savings-currency">{currencyDisplay} <span>· {normalizedCurrency === "EUR" ? "Euro" : normalizedCurrency === "USD" ? "US Dollar" : normalizedCurrency} account</span></div>
           <div className="atlas-savings-divider"/>
           <div className="atlas-savings-bottom"><div><small>Account balance</small><strong>{currencyDisplay} {balance}</strong></div><div><small>Account number</small>{accountNumber ? <button type="button" className="atlas-copy-account-number" onClick={copyAccountNumber} aria-label="Copy account number"><strong>{accountNumber}</strong>{accountCopied ? <Check size={15}/> : <Copy size={15}/>}<span>{accountCopied ? "Copied" : "Tap to copy"}</span></button> : <strong>Being assigned</strong>}</div><div className="atlas-savings-account"><small>Account holder</small><strong>{name}</strong></div></div>
           <div className="atlas-savings-footnote">Your account number is permanently assigned and linked to your profile.</div>
