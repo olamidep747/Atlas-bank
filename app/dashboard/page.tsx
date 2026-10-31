@@ -21,7 +21,7 @@ export default function DashboardPage() {
   useEffect(() => {
     const supabase = getSupabaseBrowserClient();
     let alive = true;
-    supabase.auth.getSession().then(({ data, error }) => {
+    supabase.auth.getSession().then(async ({ data, error }) => {
       if (!alive) return;
       if (error || !data.session) {
         router.replace("/login");
@@ -91,7 +91,7 @@ export default function DashboardPage() {
           <div className="atlas-savings-label">Savings Account</div>
           <div className="atlas-savings-currency">{currency} <span>· {currency === "USD" ? "US Dollar" : currency} account</span></div>
           <div className="atlas-savings-divider"/>
-          <div className="atlas-savings-bottom"><div><small>Available balance</small><strong>{currency} {balance}</strong></div><div><small>Account number</small><strong>{accountNumber || "Being assigned"}</strong></div><div className="atlas-savings-account"><small>Account holder</small><strong>{name}</strong></div></div>
+          <div className="atlas-savings-bottom"><div><small>Account balance</small><strong>{currency} {balance}</strong></div><div><small>Account number</small><strong>{accountNumber || "Being assigned"}</strong></div><div className="atlas-savings-account"><small>Account holder</small><strong>{name}</strong></div></div>
           <div className="atlas-savings-footnote">Your account number is permanently assigned and linked to your profile.</div>
         </section>
 
