@@ -10,7 +10,7 @@ type Account = Record<string, unknown>;
 type Filter = "all" | "active" | "inactive";
 
 const money = (value: unknown) => Number(value ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-const currencySymbol = (value: unknown) => String(value ?? "USD").toUpperCase() === "EUR" ? "€" : String(value ?? "USD").toUpperCase();
+const currencySymbol = (value: unknown) => String(value ?? "USD").trim().toUpperCase() === "EUR" ? "€" : String(value ?? "USD").toUpperCase();
 const field = (value: unknown, fallback = "—") => typeof value === "string" && value.trim() ? value : fallback;
 
 export default function AdminPage() {
