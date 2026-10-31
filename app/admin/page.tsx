@@ -90,6 +90,24 @@ export default function AdminPage() {
     setBusy(false);
   }
 
+  async function updateAccountStatus(nextStatus: string) {
+    if (!selectedAccount || !selected) return;
+    setBusy(true); setMessage("");
+    const { error } = await getSupabaseBrowserClient().rpc("novexxa_admin_update_account", {
+      p_account_number: selected,
+      p_demo_balance: selectedBalance,
+      p_account_status: nextStatus
+    });
+    if (error) {
+      setMessageKind("error"); setMessage(error.message);
+    } else {
+      setMessageKind("success");
+      setMessage(`Account ${selected} status changed to ${nextStatus.replaceAll("_", " ")}.`);
+      await loadAccounts();
+    }
+    setBusy(false);
+  }
+
   async function signOut() {
     await getSupabaseBrowserClient().auth.signOut();
     router.replace("/login");
@@ -145,7 +163,7 @@ export default function AdminPage() {
             <section className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
               <div className="bg-gradient-to-br from-[#102344] via-[#173b70] to-[#0759b9] p-5 text-white sm:p-6">
                 <div className="flex items-center justify-between"><span className="text-[10px] font-bold uppercase tracking-[.2em] text-blue-100">Selected account</span><Wallet size={19} className="text-amber-300"/></div>
-                {selectedAccount ? <><h2 className="mt-4 text-xl font-extrabold">{field(selectedAccount.display_name??selectedAccount.full_name,"Customer account")}</h2><p className="mt-1 text-xs text-blue-100">{field(selectedAccount.contact_email??selectedAccount.email,"No email address")}</p><div className="mt-5 rounded-xl border border-white/15 bg-white/10 p-4"><p className="text-[10px] font-semibold uppercase tracking-wider text-blue-100">Current project balance</p><p className="mt-1 text-3xl font-extrabold">{currency} {money(selectedBalance)}</p><p className="mt-2 text-xs text-blue-100">Account number · {selected}</p></div><div className="mt-4 flex items-center justify-between text-xs"><span className="text-blue-100">Account status</span><span className="rounded-full bg-white/15 px-3 py-1 font-bold capitalize">{field(selectedAccount.account_status,"Unknown")}</span></div></> : <p className="mt-5 text-sm text-blue-100">Select a customer from the list to see account details.</p>}
+                {selectedAccount ? <><h2 className="mt-4 text-xl font-extrabold">{field(selectedAccount.display_name??selectedAccount.full_name,"Customer account")}</h2><p className="mt-1 text-xs text-blue-100">{field(selectedAccount.contact_email??selectedAccount.email,"No email address")}</p><div className="mt-5 rounded-xl border border-white/15 bg-white/10 p-4"><p className="text-[10px] font-semibold uppercase tracking-wider text-blue-100">Current project balance</p><p className="mt-1 text-3xl font-extrabold">{currency} {money(selectedBalance)}</p><p className="mt-2 text-xs text-blue-100">Account number · {selected}</p></div><div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-xs"><span className="text-blue-100">Account status</span><select aria-label="Change account status" disabled={busy} value={String(selectedAccount.account_status ?? "inactive")} onChange={e=>void updateAccountStatus(e.target.value)} className="rounded-lg border border-white/20 bg-[#173b70] px-3 py-2 font-bold capitalize text-white outline-none focus:ring-2 focus:ring-amber-300">{["inactive","active","suspended","under_review","blocked"].map(status=><option key={status} value={status} className="bg-white text-slate-900">{status.replaceAll("_"," ")}</option>)}</select></div></> : <p className="mt-5 text-sm text-blue-100">Select a customer from the list to see account details.</p>}
               </div>
             </section>
 
