@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import SupportChat from "@/app/components/SupportChat";
-import { Activity, ArrowDownRight, ArrowUpRight, BadgeCheck, Banknote, CheckCircle2, ChevronRight, CircleDollarSign, Clock3, LayoutDashboard, LogOut, RefreshCw, Search, ShieldCheck, SlidersHorizontal, Users, Wallet, X } from "lucide-react";
+import { Activity, ArrowDownRight, ArrowUpRight, BadgeCheck, Banknote, CheckCircle2, ChevronRight, CircleDollarSign, Clock3, Headphones, LayoutDashboard, LogOut, RefreshCw, Search, ShieldCheck, SlidersHorizontal, Users, Wallet, X } from "lucide-react";
 
 type Account = Record<string, unknown>;
 type Filter = "all" | "active" | "inactive";
@@ -77,7 +77,7 @@ export default function AdminPage() {
     setBusy(true); setConfirming(false); setMessage("");
     const { error } = await getSupabaseBrowserClient().rpc("novexxa_admin_adjust_demo_balance", {
       p_account_number: selected, p_amount: value, p_action: action,
-      p_reason: reason.trim(), p_account_status: null
+      p_reason: reason.trim(), p_account_status: String(selectedAccount?.account_status ?? "active")
     });
     if (error) {
       setMessageKind("error"); setMessage(error.message);
