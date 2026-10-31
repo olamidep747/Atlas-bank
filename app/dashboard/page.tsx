@@ -13,7 +13,7 @@ export default function DashboardPage() {
   const [name, setName] = useState("there");
   const [email, setEmail] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
-  const [accountsOpen, setAccountsOpen] = useState(false);
+  const [accountCardOpen, setAccountCardOpen] = useState(false);
   const [checking, setChecking] = useState(true);
   const [accountNumber, setAccountNumber] = useState("");
   const [balance, setBalance] = useState("0.00");
@@ -71,8 +71,6 @@ export default function DashboardPage() {
         <a className="atlas-dash-brand" href="/"><span className="atlas-dash-mark">A</span><span>ATLAS<span>BANK</span></span></a>
         <div className="atlas-nav-label">YOUR BANK</div>
         <a className="atlas-nav-link active" href="/dashboard"><Home size={18}/> Overview</a>
-        <button type="button" className="atlas-nav-link atlas-nav-link-button" aria-expanded={accountsOpen} aria-controls="payments-menu" onClick={() => setAccountsOpen((open) => !open)}><Wallet size={18}/> Payments <ChevronDown size={15} style={{ marginLeft: "auto", transform: accountsOpen ? "rotate(180deg)" : "none" }}/></button>
-        {accountsOpen && <div id="payments-menu" className="ml-7 flex flex-col gap-1 border-l border-white/15 pl-3"><button className="atlas-nav-link" onClick={() => setActiveAction("withdraw")}>Withdraw</button><button className="atlas-nav-link" onClick={() => setActiveAction("deposit")}>Deposit</button><button className="atlas-nav-link" onClick={() => setActiveAction("transfer")}>Transfer</button></div>}
         <a className="atlas-nav-link" href="#cards"><CreditCard size={18}/> Cards</a>
         <div className="atlas-nav-label atlas-nav-label-spaced">PERSONAL</div>
         <a className="atlas-nav-link" href="#support"><Headphones size={18}/> Support</a>
@@ -89,21 +87,22 @@ export default function DashboardPage() {
 
         <div className="atlas-dash-welcome"><div><p>YOUR ACCOUNT, AT A GLANCE</p><h2>Welcome back, {name}.</h2><span>Here’s your financial overview.</span></div><div className="atlas-dash-date"><ShieldCheck size={16}/> Secure session</div></div>
 
-        <section className="atlas-savings-card" id="accounts">
-          <div className="atlas-savings-card-top"><div className="atlas-savings-icon"><Wallet size={21}/></div><span className="atlas-account-status"><i/> ACCOUNT OVERVIEW</span></div>
+        <section className={`atlas-savings-card atlas-savings-card-expandable ${accountCardOpen ? "is-expanded" : ""}`} id="accounts" onClick={() => setAccountCardOpen((open) => !open)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setAccountCardOpen((open) => !open); } }} role="button" tabIndex={0} aria-expanded={accountCardOpen} aria-label="Open account actions">
+          <div className="atlas-savings-card-top"><div className="atlas-savings-icon"><Wallet size={21}/></div><span className="atlas-account-status"><i/> ACCOUNT OVERVIEW</span><ChevronDown className="atlas-account-expand-icon" size={19} style={{ marginLeft: "auto", transform: accountCardOpen ? "rotate(180deg)" : "none" }}/></div>
           <div className="atlas-savings-label">Savings Account</div>
           <div className="atlas-savings-currency">{currency} <span>· {currency === "USD" ? "US Dollar" : currency} account</span></div>
           <div className="atlas-savings-divider"/>
           <div className="atlas-savings-bottom"><div><small>Account balance</small><strong>{currency} {balance}</strong></div><div><small>Account number</small><strong>{accountNumber || "Being assigned"}</strong></div><div className="atlas-savings-account"><small>Account holder</small><strong>{name}</strong></div></div>
           <div className="atlas-savings-footnote">Your account number is permanently assigned and linked to your profile.</div>
+          {accountCardOpen && <div className="atlas-account-actions-inline" onClick={(event) => event.stopPropagation()}>
+            <div className="atlas-account-actions-heading">Choose an account action</div>
+            <div className="atlas-quick-actions" id="cards">
+              <button type="button" className="atlas-quick-action" onClick={() => setActiveAction("withdraw")}><span><Banknote size={20}/></span><div><b>Withdraw</b><small>Withdraw funds</small></div><ArrowUpRight size={17}/></button>
+              <button type="button" className="atlas-quick-action" onClick={() => setActiveAction("deposit")}><span><ArrowDownLeft size={20}/></span><div><b>Deposit</b><small>Add money</small></div><ArrowUpRight size={17}/></button>
+              <button type="button" className="atlas-quick-action" onClick={() => setActiveAction("transfer")}><span><ArrowUpRight size={20}/></span><div><b>Transfer</b><small>Move money</small></div><ArrowUpRight size={17}/></button>
+            </div>
+          </div>}
         </section>
-
-        {accountsOpen && <><div className="atlas-dash-section-heading"><div><span>YOUR MONEY</span><h3>Account actions</h3></div></div>
-        <section className="atlas-quick-actions" id="cards">
-          <button type="button" className="atlas-quick-action" onClick={() => setActiveAction("withdraw")}><span><Banknote size={20}/></span><div><b>Withdraw</b><small>Withdraw funds</small></div><ArrowUpRight size={17}/></button>
-          <button type="button" className="atlas-quick-action" onClick={() => setActiveAction("transfer")}><span><ArrowUpRight size={20}/></span><div><b>Transfer</b><small>Move money securely</small></div><ArrowUpRight size={17}/></button>
-          <button type="button" className="atlas-quick-action" onClick={() => setActiveAction("deposit")}><span><ArrowDownLeft size={20}/></span><div><b>Deposit</b><small>Add money to your account</small></div><ArrowUpRight size={17}/></button>
-        </section></>}
 
         {activeAction && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#071126]/70 p-4" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setActiveAction(null); }}>
@@ -121,7 +120,7 @@ export default function DashboardPage() {
         )}
 
         <section className="atlas-dash-lower" id="support"><div className="atlas-dash-panel"><div className="atlas-dash-section-heading"><div><span>RECENT ACTIVITY</span><h3>Transactions</h3></div></div><div className="atlas-empty-state"><span><Wallet size={22}/></span><b>No transactions yet</b><p>Your account activity will appear here.</p></div></div><div className="atlas-dash-panel atlas-help-panel"><span className="atlas-help-icon"><Headphones size={22}/></span><h3>Need a hand?</h3><p>Our support team is here to help with your account.</p><a href="mailto:support@atlasbank.example">Contact support <ArrowUpRight size={15}/></a></div></section>
-        <nav className="atlas-mobile-bottom-nav" aria-label="Main navigation"><a className="is-active" href="/dashboard"><span><Home size={19}/></span><small>Home</small></a><button type="button" aria-expanded={accountsOpen} onClick={() => setAccountsOpen(!accountsOpen)} className={accountsOpen ? "is-active" : ""}><span><LayoutGrid size={19}/></span><small>Payments</small></button><a href="#cards"><span><CreditCard size={19}/></span><small>Cards</small></a></nav>
+        <nav className="atlas-mobile-bottom-nav" aria-label="Main navigation"><a className="is-active" href="/dashboard"><span><Home size={19}/></span><small>Home</small></a><a href="#cards"><span><CreditCard size={19}/></span><small>Cards</small></a></nav>
         <footer className="atlas-dash-footer"><span>ATLAS BANK · YOUR FUTURE, OUR PRIORITY</span><span><ShieldCheck size={14}/> Keep your account details safe</span></footer>
       </section>
     </main>
