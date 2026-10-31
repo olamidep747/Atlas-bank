@@ -167,3 +167,16 @@
 .atlas-account-actions-heading{font-size:11px;font-weight:700;color:#536781;margin-bottom:12px}
 .atlas-account-actions-inline .atlas-quick-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 @media(max-width:560px){.atlas-account-actions-inline .atlas-quick-actions{grid-template-columns:1fr}.atlas-account-actions-inline .atlas-quick-action{min-height:72px;flex-direction:row;align-items:center;justify-content:flex-start}.atlas-account-actions-inline .atlas-quick-action>svg{display:block;margin-left:auto}}
+
+
+/* Accounts tile in the mobile Home / Accounts / Cards navigation. */
+.atlas-mobile-account-slot{position:relative;display:flex;flex:1;justify-content:center;align-self:stretch}
+.atlas-mobile-account-slot>button{display:flex;flex:1;flex-direction:column;align-items:center;justify-content:center;gap:5px;border:0;background:transparent;color:#8190a5;cursor:pointer;font:inherit}
+.atlas-mobile-account-slot>button span{width:37px;height:37px;border-radius:50%;display:grid;place-items:center;background:#f1f5fa;color:#61758f}
+.atlas-mobile-account-slot>button small{font-size:9px;font-weight:700}
+.atlas-mobile-account-slot>button.is-active{color:#0066ff}
+.atlas-mobile-account-slot>button.is-active span{background:#e8f1ff;color:#0066ff;box-shadow:inset 0 0 0 1px #d4e5ff}
+.atlas-mobile-account-options{position:absolute;bottom:82px;left:50%;transform:translateX(-50%);width:164px;padding:7px;background:#fff;border:1px solid #e3eaf3;border-radius:16px;box-shadow:0 12px 35px #0a1f4430;display:flex;flex-direction:column;gap:4px;z-index:30}
+.atlas-mobile-account-options button{display:flex;align-items:center;gap:10px;width:100%;padding:11px 10px;border:0;border-radius:10px;background:#f7f9fc;color:#203653;text-align:left;font-size:12px;font-weight:650;cursor:pointer}
+.atlas-mobile-account-options button:active{background:#e8f1ff}
+@media(min-width:761px){.atlas-mobile-account-slot{display:none}}
