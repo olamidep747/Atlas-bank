@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
-import { Paperclip, Send, Headphones, MessageCircle, FileText, Check, CheckCheck, Loader2, X } from "lucide-react";
+import { Paperclip, Send, Headphones, MessageCircle, FileText, Check, CheckCheck, Loader2, X, ArrowLeft } from "lucide-react";
 
 type ChatMode = "customer" | "admin";
 type Conversation = { conversation_id: string; user_id: string; display_name?: string; customer_email?: string; account_number?: string; last_message?: string; last_message_at?: string; status?: string };
@@ -21,7 +21,6 @@ export default function SupportChat({ mode }: { mode: ChatMode }) {
   const [loading, setLoading] = useState(true);
   const [otherTyping, setOtherTyping] = useState(false);
   const [error, setError] = useState("");
-  const [expanded, setExpanded] = useState(mode === "admin");
   const bottomRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const typingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -162,12 +161,18 @@ export default function SupportChat({ mode }: { mode: ChatMode }) {
   if (loading) return <div className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-500"><Loader2 className="mr-2 inline animate-spin" size={16}/>Loading support chat…</div>;
 
   return (
-    <section className={mode === "admin" ? "overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm" : "overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"}>
-      <button type="button" onClick={() => mode === "customer" && setExpanded(v => !v)} className="flex w-full items-center justify-between bg-[#102344] px-5 py-4 text-left text-white">
+    <main className="min-h-screen bg-[#f3f6fb] text-slate-900">
+      <header className="sticky top-0 z-20 flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 shadow-sm sm:px-6">
+        <a href={mode === "admin" ? "/admin" : "/dashboard"} className="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-bold text-[#17365f] hover:bg-blue-50"><ArrowLeft size={18}/> Back</a>
+        <div className="text-right"><b className="block text-sm text-[#102344]">ATLAS BANK</b><small className="text-[11px] text-slate-500">{mode === "admin" ? "Support inbox" : "Customer support"}</small></div>
+      </header>
+      <section className="mx-auto max-w-7xl p-3 sm:p-6">
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="flex items-center justify-between bg-[#102344] px-5 py-4 text-white">
         <span className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-xl bg-white/10"><Headphones size={20}/></span><span><b className="block text-sm">{mode === "admin" ? "Live customer support" : "ATLAS live support"}</b><small className="text-xs text-blue-100">{mode === "admin" ? conversations.length + " customer conversations" : "Chat directly with our support team"}</small></span></span>
         {mode === "customer" && <MessageCircle size={19}/>}
-      </button>
-      {expanded && <div className={mode === "admin" ? "grid min-h-[560px] md:grid-cols-[260px_1fr]" : "block"}>
+      </div>
+      <div className={mode === "admin" ? "grid min-h-[calc(100vh-150px)] md:grid-cols-[300px_1fr]" : "block"}>
         {mode === "admin" && <aside className="border-b border-slate-100 md:border-b-0 md:border-r"><div className="p-4 text-xs font-extrabold uppercase tracking-wider text-slate-500">Conversations</div><div className="max-h-[560px] overflow-y-auto">{conversations.map(c=><button type="button" key={c.conversation_id} onClick={()=>setConversationId(c.conversation_id)} className={`block w-full border-t border-slate-100 p-4 text-left hover:bg-blue-50 ${conversationId===c.conversation_id?"bg-blue-50":""}`}><b className="block truncate text-sm text-slate-800">{c.display_name || c.customer_email || "Customer"}</b><small className="mt-1 block text-[11px] text-slate-500">{c.account_number || c.customer_email || "Customer account"}</small><span className="mt-2 block truncate text-xs text-slate-500">{c.last_message || "No messages yet"}</span></button>)}{!conversations.length && <p className="p-4 text-xs text-slate-500">No support conversations yet.</p>}</div></aside>}
         <div className="flex min-h-[480px] min-w-0 flex-col">
           <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3"><div><b className="text-sm text-slate-800">{mode === "admin" ? conversations.find(c=>c.conversation_id===conversationId)?.display_name || "Select a customer" : "Customer care"}</b><small className="block text-[11px] text-emerald-600">● Live chat</small></div>{mode==="admin" && <span className="text-[10px] text-slate-400">Replies appear on the customer's screen</span>}</div>
@@ -183,8 +188,10 @@ export default function SupportChat({ mode }: { mode: ChatMode }) {
             <p className="mt-2 pl-1 text-[10px] text-slate-400">Pictures and documents · Up to 15 MB per file</p>
           </form>
         </div>
-      </div>}
-    </section>
+      </div>
+      </div>
+      </section>
+    </main>
   );
 }
 
