@@ -47,8 +47,7 @@ export default function SupportChat({ mode }: { mode: ChatMode }) {
       if (e) { setError(e.message); return; }
       const rows = (data ?? []) as ChatMessage[];
       setMessages(rows);
-      const unread = rows.filter(m => m.sender_role === "support" && !m.read_at).map(m => m.id);
-      if (unread.length) await supabase.from("novexxa_chat_messages").update({ delivered_at: new Date().toISOString(), read_at: new Date().toISOString() }).in("id", unread);
+      if (rows.some(m => m.sender_role === "support" && !m.read_at)) await supabase.rpc("novexxa_customer_mark_support_read", { p_conversation_id: id });
     }
   }, [mode, supabase]);
 
