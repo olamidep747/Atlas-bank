@@ -24,7 +24,7 @@ export default function SupportChat({ mode, popup = false }: { mode: ChatMode; p
   const [popupOpen, setPopupOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [notice, setNotice] = useState("");
-  const previousUnread = useRef(0);
+  const previousUnread = useRef(0);\n  const [launcherPosition, setLauncherPosition] = useState<{x:number;y:number}|null>(null);\n  const dragStart = useRef<{pointerX:number;pointerY:number;left:number;top:number}|null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const typingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -179,7 +179,7 @@ export default function SupportChat({ mode, popup = false }: { mode: ChatMode; p
 
   if (popup) {
     return (
-      <div className="fixed bottom-5 right-5 z-[70]">
+      <div className="fixed z-[70]" style={launcherPosition ? { left: launcherPosition.x, top: launcherPosition.y } : { right: 20, bottom: 20 }}>
         {notice && !popupOpen && <div role="status" className="mb-3 max-w-[280px] rounded-xl border border-blue-100 bg-white p-3 text-xs font-semibold text-slate-700 shadow-xl">{notice}</div>}
         {popupOpen && <section role="dialog" aria-modal="false" aria-label="ATLAS customer support" className="mb-3 flex h-[min(620px,78vh)] w-[min(390px,calc(100vw-2rem))] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
           <div className="flex items-center justify-between bg-[#102344] px-4 py-3 text-white">
@@ -200,7 +200,31 @@ export default function SupportChat({ mode, popup = false }: { mode: ChatMode; p
             </form>
           </div>}
         </section>}
-        <button type="button" onClick={() => { setPopupOpen(v=>!v); setNotice(""); }} className="relative ml-auto flex items-center gap-2 rounded-full bg-[#102344] px-5 py-3 text-sm font-bold text-white shadow-xl hover:bg-blue-900"><MessageCircle size={19}/>{popupOpen?"Close chat":"Chat with support"}{unreadCount>0 && <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full border-2 border-white bg-red-600 px-1 text-[10px] font-extrabold text-white">{unreadCount>9?"9+":unreadCount}</span>}</button>
+        <button
+          type="button"
+          aria-label={popupOpen ? "Close support chat" : "Open support chat"}
+          onPointerDown={event => {
+            const rect = event.currentTarget.getBoundingClientRect();
+            dragStart.current = { pointerX: event.clientX, pointerY: event.clientY, left: rect.left, top: rect.top };
+            event.currentTarget.setPointerCapture(event.pointerId);
+          }}
+          onPointerMove={event => {
+            if (!dragStart.current || !(event.buttons & 1)) return;
+            const start = dragStart.current;
+            const width = event.currentTarget.offsetWidth;
+            const height = event.currentTarget.offsetHeight;
+            const x = Math.max(8, Math.min(window.innerWidth - width - 8, start.left + event.clientX - start.pointerX));
+            const y = Math.max(8, Math.min(window.innerHeight - height - 8, start.top + event.clientY - start.pointerY));
+            setLauncherPosition({ x, y });
+          }}
+          onPointerUp={event => { dragStart.current = null; }}
+          onClick={() => { setPopupOpen(v=>!v); setNotice(""); }}
+          className="relative grid h-14 w-14 place-items-center rounded-full bg-[#102344] text-white shadow-xl ring-2 ring-white transition hover:scale-105 hover:bg-blue-900"
+          style={{ touchAction: "none", cursor: "grab" }}
+        >
+          <MessageCircle size={24}/>
+          {unreadCount>0 && <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full border-2 border-white bg-red-600 px-1 text-[10px] font-extrabold text-white">{unreadCount>9?"9+":unreadCount}</span>}
+        </button>
       </div>
     );
   }
