@@ -86,7 +86,7 @@ export default function DashboardPage() {
         <a className="atlas-nav-link active" href="/dashboard"><Home size={18}/> Overview</a>
         <a className="atlas-nav-link" href="#cards"><CreditCard size={18}/> Cards</a>
         <div className="atlas-nav-label atlas-nav-label-spaced">PERSONAL</div>
-        <a className="atlas-nav-link" href="#support"><Headphones size={18}/> Support</a>
+        <a className="atlas-nav-link" href="/support"><Headphones size={18}/> Support</a>
         <a className="atlas-nav-link" href="#settings"><Settings size={18}/> Settings</a>
         <div className="atlas-side-bottom"><div className="atlas-side-security"><ShieldCheck size={18}/><span><b>Your security matters</b><small>Keep your sign-in details private.</small></span></div><button className="atlas-nav-link atlas-signout" onClick={signOut}><LogOut size={18}/> Sign out</button></div>
       </aside>
@@ -124,7 +124,7 @@ export default function DashboardPage() {
           </div>
         )}
 
-        <section className="atlas-dash-lower" id="support"><div className="atlas-dash-panel"><div className="atlas-dash-section-heading"><div><span>RECENT ACTIVITY</span><h3>Transactions</h3></div></div><div className="atlas-empty-state"><span><Wallet size={22}/></span><b>No transactions yet</b><p>Your account activity will appear here.</p></div></div><SupportChat mode="customer"/></section>
+        <section className="atlas-dash-lower"><div className="atlas-dash-panel"><div className="atlas-dash-section-heading"><div><span>RECENT ACTIVITY</span><h3>Transactions</h3></div></div><div className="atlas-empty-state"><span><Wallet size={22}/></span><b>No transactions yet</b><p>Your account activity will appear here.</p></div></div><a href="/support" className="flex min-h-[180px] flex-col justify-center rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md"><span className="mb-4 grid h-11 w-11 place-items-center rounded-xl bg-blue-50 text-blue-700"><Headphones size={22}/></span><b className="text-lg text-[#102344]">Need help?</b><p className="mt-1 text-sm text-slate-500">Open your private ATLAS support conversation.</p><span className="mt-4 text-sm font-bold text-blue-700">Open live support →</span></a></section>
         <nav className={`atlas-mobile-bottom-nav ${accountMenuOpen ? "has-account-menu" : ""}`} aria-label="Main navigation">
           <a className="is-active" href="/dashboard"><span><Home size={19}/></span><small>Home</small></a>
           <div className="atlas-mobile-account-slot">
