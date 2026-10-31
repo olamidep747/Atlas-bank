@@ -63,7 +63,7 @@ export default function SupportChat({ mode, popup = false }: { mode: ChatMode; p
     }
   }, [mode, supabase, popupOpen]);
 
-  useEffect(() => {
+  useEffect(() => {\n    if (!popup) return;\n    const openSupport = () => { setPopupOpen(true); setNotice(""); };\n    window.addEventListener("atlas-open-support", openSupport);\n    return () => window.removeEventListener("atlas-open-support", openSupport);\n  }, [popup]);\n\n  useEffect(() => {
     let alive = true;
     (async () => {
       const { data } = await supabase.auth.getSession();
