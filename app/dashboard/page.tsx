@@ -139,6 +139,7 @@ export default function DashboardPage() {
         </nav>
         <footer className="atlas-dash-footer"><span>ATLAS BANK · YOUR FUTURE, OUR PRIORITY</span><span><ShieldCheck size={14}/> Keep your account details safe</span></footer>
       </section>
+      <SupportChat mode="customer" popup />
     </main>
   );
 }
