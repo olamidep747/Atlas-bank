@@ -7,6 +7,7 @@ import {
   Headphones, Home, LogOut, Menu, Settings, ShieldCheck, Wallet, X, Banknote, LayoutGrid, Copy, Check
 } from "lucide-react";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import SupportChat from "@/app/components/SupportChat";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -123,7 +124,7 @@ export default function DashboardPage() {
           </div>
         )}
 
-        <section className="atlas-dash-lower" id="support"><div className="atlas-dash-panel"><div className="atlas-dash-section-heading"><div><span>RECENT ACTIVITY</span><h3>Transactions</h3></div></div><div className="atlas-empty-state"><span><Wallet size={22}/></span><b>No transactions yet</b><p>Your account activity will appear here.</p></div></div><div className="atlas-dash-panel atlas-help-panel"><span className="atlas-help-icon"><Headphones size={22}/></span><h3>Need a hand?</h3><p>Our support team is here to help with your account.</p><a href="mailto:support@atlasbank.example">Contact support <ArrowUpRight size={15}/></a></div></section>
+        <section className="atlas-dash-lower" id="support"><div className="atlas-dash-panel"><div className="atlas-dash-section-heading"><div><span>RECENT ACTIVITY</span><h3>Transactions</h3></div></div><div className="atlas-empty-state"><span><Wallet size={22}/></span><b>No transactions yet</b><p>Your account activity will appear here.</p></div></div><SupportChat mode="customer"/></section>
         <nav className={`atlas-mobile-bottom-nav ${accountMenuOpen ? "has-account-menu" : ""}`} aria-label="Main navigation">
           <a className="is-active" href="/dashboard"><span><Home size={19}/></span><small>Home</small></a>
           <div className="atlas-mobile-account-slot">
