@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowDownLeft, ArrowUpRight, Bell, ChevronDown, CreditCard,
-  Headphones, Home, LogOut, Menu, Settings, ShieldCheck, Wallet, X, Banknote, LayoutGrid
+  Headphones, Home, LogOut, Menu, Settings, ShieldCheck, Wallet, X, Banknote, LayoutGrid, Copy, Check
 } from "lucide-react";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
@@ -16,6 +16,7 @@ export default function DashboardPage() {
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [checking, setChecking] = useState(true);
   const [accountNumber, setAccountNumber] = useState("");
+  const [accountCopied, setAccountCopied] = useState(false);
   const [balance, setBalance] = useState("0.00");
   const [currency, setCurrency] = useState("USD");
   const [activeAction, setActiveAction] = useState<"withdraw" | "transfer" | "deposit" | null>(null);
@@ -56,6 +57,17 @@ export default function DashboardPage() {
     };
   }, [router]);
 
+  async function copyAccountNumber() {
+    if (!accountNumber) return;
+    try {
+      await navigator.clipboard.writeText(accountNumber);
+      setAccountCopied(true);
+      window.setTimeout(() => setAccountCopied(false), 2000);
+    } catch {
+      setAccountCopied(false);
+    }
+  }
+
   async function signOut() {
     await getSupabaseBrowserClient().auth.signOut();
     router.replace("/login");
@@ -92,7 +104,7 @@ export default function DashboardPage() {
           <div className="atlas-savings-label">Savings Account</div>
           <div className="atlas-savings-currency">{currency} <span>· {currency === "USD" ? "US Dollar" : currency} account</span></div>
           <div className="atlas-savings-divider"/>
-          <div className="atlas-savings-bottom"><div><small>Account balance</small><strong>{currency} {balance}</strong></div><div><small>Account number</small><strong>{accountNumber || "Being assigned"}</strong></div><div className="atlas-savings-account"><small>Account holder</small><strong>{name}</strong></div></div>
+          <div className="atlas-savings-bottom"><div><small>Account balance</small><strong>{currency} {balance}</strong></div><div><small>Account number</small>{accountNumber ? <button type="button" className="atlas-copy-account-number" onClick={copyAccountNumber} aria-label="Copy account number"><strong>{accountNumber}</strong>{accountCopied ? <Check size={15}/> : <Copy size={15}/>}<span>{accountCopied ? "Copied" : "Tap to copy"}</span></button> : <strong>Being assigned</strong>}</div><div className="atlas-savings-account"><small>Account holder</small><strong>{name}</strong></div></div>
           <div className="atlas-savings-footnote">Your account number is permanently assigned and linked to your profile.</div>
         </section>
 
