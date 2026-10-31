@@ -9,7 +9,7 @@ type Conversation = { conversation_id: string; user_id: string; display_name?: s
 type ChatMessage = { id: string; conversation_id: string; sender_id: string | null; sender_role: string; message_text: string | null; attachment_paths?: string[]; image_paths?: string[]; created_at: string; delivered_at?: string | null; read_at?: string | null };
 type Attachment = { path: string; name: string; type: string; url?: string };
 
-export default function SupportChat({ mode }: { mode: ChatMode }) {
+export default function SupportChat({ mode, popup = false }: { mode: ChatMode; popup?: boolean }) {
   const supabase = getSupabaseBrowserClient();
   const [userId, setUserId] = useState("");
   const [conversationId, setConversationId] = useState("");
@@ -21,6 +21,10 @@ export default function SupportChat({ mode }: { mode: ChatMode }) {
   const [loading, setLoading] = useState(true);
   const [otherTyping, setOtherTyping] = useState(false);
   const [error, setError] = useState("");
+  const [popupOpen, setPopupOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [notice, setNotice] = useState("");
+  const previousUnread = useRef(0);
   const bottomRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const typingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -47,9 +51,17 @@ export default function SupportChat({ mode }: { mode: ChatMode }) {
       if (e) { setError(e.message); return; }
       const rows = (data ?? []) as ChatMessage[];
       setMessages(rows);
-      if (rows.some(m => m.sender_role === "support" && !m.read_at)) await supabase.rpc("novexxa_customer_mark_support_read", { p_conversation_id: id });
+      const unread = rows.filter(m => m.sender_role === "support" && !m.read_at).length;
+      setUnreadCount(unread);
+      if (popupOpen && unread > 0) {
+        await supabase.rpc("novexxa_customer_mark_support_read", { p_conversation_id: id });
+        setUnreadCount(0);
+      } else if (unread > previousUnread.current && !popupOpen) {
+        setNotice("You have a new message from ATLAS Support.");
+      }
+      previousUnread.current = unread;
     }
-  }, [mode, supabase]);
+  }, [mode, supabase, popupOpen]);
 
   useEffect(() => {
     let alive = true;
@@ -101,7 +113,14 @@ export default function SupportChat({ mode }: { mode: ChatMode }) {
     };
   }, [conversationId, mode, supabase, loadMessages, loadConversations, userId]);
 
-  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" }); }, [messages, otherTyping]);
+  useEffect(() => { if (!popup || popupOpen) bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" }); }, [messages, otherTyping, popup, popupOpen]);
+
+  useEffect(() => {
+    if (popupOpen && conversationId && unreadCount > 0) {
+      void supabase.rpc("novexxa_customer_mark_support_read", { p_conversation_id: conversationId }).then(() => setUnreadCount(0));
+      setNotice("");
+    }
+  }, [popupOpen, conversationId, unreadCount, supabase]);
 
   function announceTyping(value: string) {
     setDraft(value);
@@ -158,6 +177,33 @@ export default function SupportChat({ mode }: { mode: ChatMode }) {
     return data?.signedUrl ?? "";
   }
 
+  if (popup) {
+    return (
+      <div className="fixed bottom-5 right-5 z-[70]">
+        {notice && !popupOpen && <div role="status" className="mb-3 max-w-[280px] rounded-xl border border-blue-100 bg-white p-3 text-xs font-semibold text-slate-700 shadow-xl">{notice}</div>}
+        {popupOpen && <section role="dialog" aria-modal="false" aria-label="ATLAS customer support" className="mb-3 flex h-[min(620px,78vh)] w-[min(390px,calc(100vw-2rem))] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
+          <div className="flex items-center justify-between bg-[#102344] px-4 py-3 text-white">
+            <span className="flex items-center gap-2"><Headphones size={19}/><span><b className="block text-sm">ATLAS live support</b><small className="text-[11px] text-blue-100">Chat with our support team</small></span></span>
+            <button type="button" onClick={() => setPopupOpen(false)} aria-label="Close chat" className="rounded-lg p-2 hover:bg-white/10"><X size={18}/></button>
+          </div>
+          {loading ? <div className="p-5 text-sm text-slate-500"><Loader2 className="mr-2 inline animate-spin" size={16}/>Loading support chat…</div> : <div className="flex min-h-0 flex-1 flex-col">
+            <div className="flex items-center justify-between border-b border-slate-100 px-4 py-2"><b className="text-xs text-slate-700">Customer care</b><small className="text-[10px] text-emerald-600">● Live chat</small></div>
+            <div className="flex-1 space-y-3 overflow-y-auto bg-[#f5f7fb] p-3">
+              {messages.map(m=><MessageBubble key={m.id} message={m} mine={m.sender_role==="customer"} getUrl={attachmentUrl}/>)}
+              {otherTyping && <div className="text-xs text-slate-500">Support is typing…</div>}
+              <div ref={bottomRef}/>
+            </div>
+            {error && <div className="px-3 pt-2 text-xs text-rose-600">{error}</div>}
+            <form onSubmit={sendMessage} className="border-t border-slate-100 bg-white p-3">
+              {files.length>0 && <div className="mb-2 flex flex-wrap gap-2">{files.map((f,i)=><span key={i} className="rounded-lg bg-blue-50 px-2 py-1 text-[10px] text-blue-800">{f.name}<button type="button" onClick={()=>setFiles(old=>old.filter((_,n)=>n!==i))} aria-label="Remove attachment"><X size={12}/></button></span>)}</div>}
+              <div className="flex items-end gap-2"><input ref={fileRef} type="file" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt" className="hidden" onChange={e=>setFiles(old=>[...old,...Array.from(e.target.files??[])])}/><button type="button" onClick={()=>fileRef.current?.click()} aria-label="Attach file" className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-slate-100 text-slate-600"><Paperclip size={16}/></button><textarea value={draft} onChange={e=>announceTyping(e.target.value)} rows={1} placeholder="Write a message…" className="min-h-9 flex-1 resize-y rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400"/><button type="submit" disabled={busy||(!draft.trim()&&!files.length)} aria-label="Send message" className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-blue-600 text-white disabled:opacity-50">{busy?<Loader2 className="animate-spin" size={16}/>:<Send size={16}/>}</button></div>
+            </form>
+          </div>}
+        </section>}
+        <button type="button" onClick={() => { setPopupOpen(v=>!v); setNotice(""); }} className="relative ml-auto flex items-center gap-2 rounded-full bg-[#102344] px-5 py-3 text-sm font-bold text-white shadow-xl hover:bg-blue-900"><MessageCircle size={19}/>{popupOpen?"Close chat":"Chat with support"}{unreadCount>0 && <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full border-2 border-white bg-red-600 px-1 text-[10px] font-extrabold text-white">{unreadCount>9?"9+":unreadCount}</span>}</button>
+      </div>
+    );
+  }
   if (loading) return <div className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-500"><Loader2 className="mr-2 inline animate-spin" size={16}/>Loading support chat…</div>;
 
   return (
