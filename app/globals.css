@@ -156,3 +156,14 @@
   .atlas-quick-action small{font-size:8px;white-space:normal}
   .atlas-quick-action>svg{display:none}
 }
+
+
+/* Expandable account card: actions stay inside the account panel. */
+.atlas-savings-card-expandable{cursor:pointer;transition:box-shadow .2s ease,border-color .2s ease}
+.atlas-savings-card-expandable:hover{box-shadow:0 14px 34px #0a1f4418}
+.atlas-savings-card-expandable:focus-visible{outline:3px solid #7aa7ef;outline-offset:4px}
+.atlas-account-expand-icon{color:#8da6c9;transition:transform .2s ease}
+.atlas-account-actions-inline{margin-top:22px;padding-top:19px;border-top:1px solid #e3eaf3;cursor:default}
+.atlas-account-actions-heading{font-size:11px;font-weight:700;color:#536781;margin-bottom:12px}
+.atlas-account-actions-inline .atlas-quick-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media(max-width:560px){.atlas-account-actions-inline .atlas-quick-actions{grid-template-columns:1fr}.atlas-account-actions-inline .atlas-quick-action{min-height:72px;flex-direction:row;align-items:center;justify-content:flex-start}.atlas-account-actions-inline .atlas-quick-action>svg{display:block;margin-left:auto}}
