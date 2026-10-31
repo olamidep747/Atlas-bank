@@ -180,3 +180,10 @@
 .atlas-mobile-account-options button{display:flex;align-items:center;gap:10px;width:100%;padding:11px 10px;border:0;border-radius:10px;background:#f7f9fc;color:#203653;text-align:left;font-size:12px;font-weight:650;cursor:pointer}
 .atlas-mobile-account-options button:active{background:#e8f1ff}
 @media(min-width:761px){.atlas-mobile-account-slot{display:none}}
+
+
+.atlas-copy-account-number{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;padding:0;border:0;background:transparent;color:inherit;text-align:left;cursor:pointer}
+.atlas-copy-account-number strong{letter-spacing:.02em}
+.atlas-copy-account-number svg{color:#d5b34d;flex:none}
+.atlas-copy-account-number span{font-size:10px;font-weight:650;color:#d5b34d}
+.atlas-copy-account-number:focus-visible{outline:2px solid #d5b34d;outline-offset:4px;border-radius:4px}
