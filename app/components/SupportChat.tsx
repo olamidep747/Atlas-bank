@@ -41,7 +41,9 @@ export default function SupportChat({ mode }: { mode: ChatMode }) {
     if (mode === "admin") {
       const { data, error: e } = await supabase.rpc("novexxa_admin_get_chat_messages", { p_conversation_id: id });
       if (e) { setError(e.message); return; }
-      setMessages((data ?? []) as ChatMessage[]);
+      const rows = (data ?? []) as ChatMessage[];
+      setMessages(rows);
+      if (rows.some(m => m.sender_role === "customer" && !m.read_at)) await supabase.rpc("novexxa_admin_mark_chat_read", { p_conversation_id: id });
     } else {
       const { data, error: e } = await supabase.from("novexxa_chat_messages").select("*").eq("conversation_id", id).order("created_at", { ascending: true });
       if (e) { setError(e.message); return; }
