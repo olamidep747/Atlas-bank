@@ -9,6 +9,9 @@ import {
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import SupportChat from "@/app/components/SupportChat";
 
+type AccountActivity = { id: string; transaction_type: string; amount: number | string; currency_code: string; status: string; description: string | null; reference_code: string | null; sender_name: string | null; recipient_name: string | null; reason_category: string | null; created_at: string; is_project_adjustment: boolean };
+const formatAmount = (value: number | string) => Number(value ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
 export default function DashboardPage() {
   const router = useRouter();
   const [name, setName] = useState("there");
@@ -20,6 +23,8 @@ export default function DashboardPage() {
   const [accountCopied, setAccountCopied] = useState(false);
   const [balance, setBalance] = useState("0.00");
   const [currency, setCurrency] = useState("USD");
+  const [activities, setActivities] = useState<AccountActivity[]>([]);
+  const [activityLoading, setActivityLoading] = useState(true);
   const normalizedCurrency = String(currency ?? "USD").trim().toUpperCase();
   const currencyDisplay = normalizedCurrency === "EUR" ? "€" : normalizedCurrency;
   const [activeAction, setActiveAction] = useState<"withdraw" | "transfer" | "deposit" | null>(null);
@@ -48,6 +53,16 @@ export default function DashboardPage() {
         setBalance(Number(profile.demo_balance ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
         setCurrency(profile.currency_code ?? "USD");
         if (profile.display_name) setName(String(profile.display_name).trim().split(" ")[0]);
+      }
+      const { data: activityRows, error: activityError } = await supabase
+        .from("novexxa_transactions")
+        .select("id, transaction_type, amount, currency_code, status, description, reference_code, sender_name, recipient_name, reason_category, created_at, is_project_adjustment")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(20);
+      if (alive) {
+        if (!activityError) setActivities((activityRows ?? []) as AccountActivity[]);
+        setActivityLoading(false);
       }
       setChecking(false);
     });
@@ -126,7 +141,9 @@ export default function DashboardPage() {
           </div>
         )}
 
-        <section className="atlas-dash-lower"><div className="atlas-dash-panel"><div className="atlas-dash-section-heading"><div><span>RECENT ACTIVITY</span><h3>Transactions</h3></div></div><div className="atlas-empty-state"><span><Wallet size={22}/></span><b>No transactions yet</b><p>Your account activity will appear here.</p></div></div><button type="button" onClick={() => window.dispatchEvent(new Event("atlas-open-support"))} className="flex min-h-[180px] flex-col justify-center rounded-2xl border border-slate-200 bg-white p-6 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md"><span className="mb-4 grid h-11 w-11 place-items-center rounded-xl bg-blue-50 text-blue-700"><Headphones size={22}/></span><b className="text-lg text-[#102344]">Need help?</b><p className="mt-1 text-sm text-slate-500">Open your private ATLAS support conversation.</p><span className="mt-4 text-sm font-bold text-blue-700">Open live support →</span></button></section>
+        <section className="atlas-dash-lower"><div className="atlas-dash-panel"><div className="atlas-dash-section-heading"><div><span>RECENT ACTIVITY</span><h3>Transaction history</h3></div><span className="text-[10px] font-semibold text-slate-400">LATEST 20</span></div>
+          {activityLoading ? <div className="p-6 text-sm text-slate-500">Loading account activity…</div> : activities.length === 0 ? <div className="atlas-empty-state"><span><Wallet size={22}/></span><b>No transactions yet</b><p>Your recorded account activity will appear here.</p></div> : <div className="divide-y divide-slate-100">{activities.map(item => { const incoming = ["credit","deposit","incoming","money_received"].includes(String(item.transaction_type).toLowerCase()); const symbol = String(item.currency_code ?? currency).toUpperCase() === "EUR" ? "€" : String(item.currency_code ?? currency).toUpperCase(); return <article key={item.id} className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between"><div className="flex min-w-0 items-start gap-3"><span className={\`grid h-10 w-10 shrink-0 place-items-center rounded-full \${incoming ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"}\`}>{incoming ? <ArrowDownLeft size={19}/> : <ArrowUpRight size={19}/>}</span><div className="min-w-0"><b className="block truncate text-sm text-slate-800">{item.reason_category || (incoming ? "Money received" : "Money sent")}</b><p className="mt-1 text-xs text-slate-500">{incoming ? \`From: \${item.sender_name || "Sender not provided"}\` : \`To: \${item.recipient_name || "Recipient not provided"}\`}</p>{item.description && <p className="mt-1 break-words text-xs leading-5 text-slate-500">{item.description}</p>}<p className="mt-1 text-[10px] text-slate-400">{new Date(item.created_at).toLocaleString()} · Ref {item.reference_code || "—"}</p>{item.is_project_adjustment && <span className="mt-2 inline-flex rounded-full bg-amber-50 px-2 py-1 text-[9px] font-bold uppercase tracking-wide text-amber-800">Recorded project activity</span>}</div></div><div className="shrink-0 sm:text-right"><b className={\`text-sm font-extrabold \${incoming ? "text-emerald-700" : "text-slate-800"}\`}>{incoming ? "+" : "−"}{symbol} {formatAmount(item.amount)}</b><p className="mt-1 text-[10px] capitalize text-slate-400">{String(item.status || "recorded").replaceAll("_"," ")}</p></div></article>})}</div>}
+          </div><button type="button" onClick={() => window.dispatchEvent(new Event("atlas-open-support"))} className="flex min-h-[180px] flex-col justify-center rounded-2xl border border-slate-200 bg-white p-6 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md"><span className="mb-4 grid h-11 w-11 place-items-center rounded-xl bg-blue-50 text-blue-700"><Headphones size={22}/></span><b className="text-lg text-[#102344]">Need help?</b><p className="mt-1 text-sm text-slate-500">Open your private ATLAS support conversation.</p><span className="mt-4 text-sm font-bold text-blue-700">Open live support →</span></button></section>
         <nav className={`atlas-mobile-bottom-nav ${accountMenuOpen ? "has-account-menu" : ""}`} aria-label="Main navigation">
           <a className="is-active" href="/dashboard"><span><Home size={19}/></span><small>Home</small></a>
           <div className="atlas-mobile-account-slot">
