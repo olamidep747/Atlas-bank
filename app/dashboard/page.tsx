@@ -88,7 +88,7 @@ export default function DashboardPage() {
         <a className="atlas-nav-link active" href="/dashboard"><Home size={18}/> Overview</a>
         <a className="atlas-nav-link" href="#cards"><CreditCard size={18}/> Cards</a>
         <div className="atlas-nav-label atlas-nav-label-spaced">PERSONAL</div>
-        <button type="button" className="atlas-nav-link" onClick={() => window.dispatchEvent(new Event("atlas-open-support"))}><Headphones size={18}/> Support</button>
+        <button type="button" className="atlas-nav-link atlas-nav-link-button" onClick={() => window.dispatchEvent(new Event("atlas-open-support"))}><Headphones size={18}/> Support</button>
         <a className="atlas-nav-link" href="#settings"><Settings size={18}/> Settings</a>
         <div className="atlas-side-bottom"><div className="atlas-side-security"><ShieldCheck size={18}/><span><b>Your security matters</b><small>Keep your sign-in details private.</small></span></div><button className="atlas-nav-link atlas-signout" onClick={signOut}><LogOut size={18}/> Sign out</button></div>
       </aside>
