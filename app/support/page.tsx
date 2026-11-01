@@ -1,1 +1,5 @@
-import { redirect } from "next/navigation";\n\nexport default function SupportPage() {\n  redirect("/dashboard");\n}\n
+import { redirect } from "next/navigation";
+
+export default function SupportPage() {
+  redirect("/dashboard");
+}
