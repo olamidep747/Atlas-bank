@@ -58,7 +58,10 @@
 .atlas-dash-mark{width:34px;height:34px;border-radius:9px;background:#0066ff;display:grid;place-items:center;color:white;font:800 22px Manrope}
 .atlas-nav-label{font-size:8px;font-weight:700;letter-spacing:.18em;color:#7186a5;padding:0 12px 12px}
 .atlas-nav-label-spaced{margin-top:30px}
-.atlas-nav-link{height:46px;display:flex;align-items:center;gap:13px;padding:0 12px;border-radius:7px;color:#b6c6dc;font-size:12px;margin:2px 0}\n.atlas-nav-link-button{width:100%;border:0;background:transparent;text-align:left;font-family:inherit;cursor:pointer}\n.atlas-nav-link-button:hover{background:#ffffff10;color:#fff}\n.atlas-nav-link-button:focus-visible{outline:2px solid #ffd84d;outline-offset:2px}
+.atlas-nav-link{height:46px;display:flex;align-items:center;gap:13px;padding:0 12px;border-radius:7px;color:#b6c6dc;font-size:12px;margin:2px 0}
+.atlas-nav-link-button{width:100%;border:0;background:transparent;text-align:left;font-family:inherit;cursor:pointer}
+.atlas-nav-link-button:hover{background:#ffffff10;color:#fff}
+.atlas-nav-link-button:focus-visible{outline:2px solid #ffd84d;outline-offset:2px}
 .atlas-nav-link svg{color:#8da6c9}
 .atlas-nav-link.active{background:#123b73;color:white}
 .atlas-nav-link.active svg{color:#ffd84d}
