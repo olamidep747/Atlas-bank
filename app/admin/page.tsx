@@ -26,6 +26,9 @@ export default function AdminPage() {
   const [amount, setAmount] = useState("");
   const [action, setAction] = useState<"add" | "deduct">("add");
   const [reason, setReason] = useState("");
+  const [reasonCategory, setReasonCategory] = useState("Incoming transfer");
+  const [senderName, setSenderName] = useState("");
+  const [recipientName, setRecipientName] = useState("");
   const [confirming, setConfirming] = useState(false);
 
   const loadAccounts = useCallback(async () => {
@@ -65,7 +68,7 @@ export default function AdminPage() {
   async function adjustBalance(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const value = Number(amount);
-    if (!selected || !Number.isFinite(value) || value <= 0 || !reason.trim()) {
+    if (!selected || !Number.isFinite(value) || value <= 0 || !reasonCategory.trim() || (action === "add" && !senderName.trim())) {
       setMessageKind("error"); setMessage("Select an account and enter a valid amount and reason."); return;
     }
     if (action === "deduct" && value > selectedBalance) {
@@ -79,14 +82,17 @@ export default function AdminPage() {
     setBusy(true); setConfirming(false); setMessage("");
     const { error } = await getSupabaseBrowserClient().rpc("novexxa_admin_adjust_demo_balance", {
       p_account_number: selected, p_amount: value, p_action: action,
-      p_reason: reason.trim(), p_account_status: String(selectedAccount?.account_status ?? "active")
+      p_reason: `${reasonCategory}${reason.trim() ? ` — ${reason.trim()}` : ""}`, p_account_status: String(selectedAccount?.account_status ?? "active"),
+      p_sender_name: action === "add" ? senderName.trim() : null,
+      p_recipient_name: action === "deduct" ? recipientName.trim() || null : null,
+      p_reason_category: reasonCategory
     });
     if (error) {
       setMessageKind("error"); setMessage(error.message);
     } else {
       setMessageKind("success");
       setMessage(`${action === "add" ? "Added" : "Deducted"} ${currencyDisplay} ${money(value)} for account ${selected}. The adjustment was recorded in the audit log.`);
-      setAmount(""); setReason("");
+      setAmount(""); setReason(""); setSenderName(""); setRecipientName(""); setReasonCategory(action === "add" ? "Incoming transfer" : "Account adjustment");
       await loadAccounts();
     }
     setBusy(false);
@@ -176,7 +182,9 @@ export default function AdminPage() {
                 <div className="grid grid-cols-2 gap-2"><button type="button" onClick={()=>setAction("add")} className={`flex items-center justify-center gap-2 rounded-xl border-2 p-3 text-sm font-extrabold transition ${action==="add"?"border-emerald-300 bg-emerald-50 text-emerald-800":"border-slate-100 text-slate-500 hover:border-emerald-200"}`}><ArrowUpRight size={17}/> Add funds</button><button type="button" onClick={()=>setAction("deduct")} className={`flex items-center justify-center gap-2 rounded-xl border-2 p-3 text-sm font-extrabold transition ${action==="deduct"?"border-rose-300 bg-rose-50 text-rose-800":"border-slate-100 text-slate-500 hover:border-rose-200"}`}><ArrowDownRight size={17}/> Deduct</button></div>
                 <label className="block text-xs font-bold text-slate-600">Amount ({currencyDisplay})<div className="mt-2 flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3 focus-within:border-blue-400 focus-within:ring-4 focus-within:ring-blue-50"><span className="text-sm font-bold text-slate-400">{currencyDisplay}</span><input type="number" min="0.01" step="0.01" value={amount} onChange={e=>setAmount(e.target.value)} placeholder="0.00" className="w-full bg-transparent p-3 text-lg font-extrabold text-slate-800 outline-none" required/></div></label>
                 <div className="flex flex-wrap gap-2">{[100,250,500,1000].map(v=><button key={v} type="button" onClick={()=>setAmount(String(v))} className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700">{currencyDisplay} {v.toLocaleString()}</button>)}</div>
-                <label className="block text-xs font-bold text-slate-600">Reason / admin note<textarea value={reason} onChange={e=>setReason(e.target.value)} placeholder="Explain why this adjustment is being made…" rows={3} className="mt-2 w-full resize-y rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm outline-none focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-50" required/></label>
+                {action === "add" ? <label className="block text-xs font-bold text-slate-600">Sender name<input value={senderName} onChange={e=>setSenderName(e.target.value)} placeholder="Enter the sender’s full name" className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm outline-none focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-50" required/></label> : <label className="block text-xs font-bold text-slate-600">Recipient name (optional)<input value={recipientName} onChange={e=>setRecipientName(e.target.value)} placeholder="Enter recipient name" className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm outline-none focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-50"/></label>}
+                <label className="block text-xs font-bold text-slate-600">Transaction category<select value={reasonCategory} onChange={e=>setReasonCategory(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm outline-none focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-50">{(action === "add" ? ["Incoming transfer","Cash deposit","Refund","Account credit","Promotional credit","Balance correction","Other"] : ["Outgoing transfer","Cash withdrawal","Service charge","Account debit","Balance correction","Other"]).map(item=><option key={item}>{item}</option>)}</select></label>
+                <label className="block text-xs font-bold text-slate-600">Transaction description / note<textarea value={reason} onChange={e=>setReason(e.target.value)} placeholder="Add a clear description for this account activity…" rows={3} className="mt-2 w-full resize-y rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm outline-none focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-50"/></label>
                 <button disabled={busy || loading || !selected || !accounts.length} className={`w-full rounded-xl p-3.5 text-sm font-extrabold text-white shadow-lg transition disabled:opacity-50 ${action==="add"?"bg-emerald-600 shadow-emerald-900/10 hover:bg-emerald-700":"bg-rose-600 shadow-rose-900/10 hover:bg-rose-700"}`}>{busy?"Saving adjustment…":`Review ${action==="add"?"addition":"deduction"}`}</button>
               </form>
               <p className="mt-4 rounded-xl bg-amber-50 p-3 text-[11px] leading-5 text-amber-900">These controls update project records only. They do not move, hold, or transfer real customer funds.</p>
@@ -185,7 +193,7 @@ export default function AdminPage() {
         </div>
         <a href="/admin/support" className="mt-8 flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-blue-300 hover:shadow-md"><span className="grid h-12 w-12 place-items-center rounded-xl bg-blue-50 text-blue-700"><Headphones size={23}/></span><span className="min-w-0 flex-1"><b className="block text-base text-[#102344]">Customer support inbox</b><small className="mt-1 block text-xs text-slate-500">Open customer conversations and reply in the full chat workspace.</small></span><span className="text-sm font-bold text-blue-700">Open inbox →</span></a>
       </section>
-      {confirming && <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#071126]/65 p-4" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)setConfirming(false)}}><section role="dialog" aria-modal="true" aria-labelledby="confirm-adjustment-title" className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"><div className="flex items-start justify-between"><div><p className="text-[10px] font-extrabold uppercase tracking-[.2em] text-blue-700">FINAL REVIEW</p><h2 id="confirm-adjustment-title" className="mt-2 text-xl font-extrabold text-slate-900">Confirm balance change</h2></div><button onClick={()=>setConfirming(false)} aria-label="Close confirmation" className="rounded-full bg-slate-100 p-2 text-slate-500"><X size={17}/></button></div><div className="mt-5 rounded-xl bg-slate-50 p-4"><p className="text-xs text-slate-500">Account · {selected}</p><p className={`mt-2 text-2xl font-extrabold ${action==="add"?"text-emerald-700":"text-rose-700"}`}>{action==="add"?"+":"−"}{currencyDisplay} {money(amount)}</p><p className="mt-2 text-xs text-slate-600">New project balance: {currencyDisplay} {money(action==="add"?selectedBalance+Number(amount):selectedBalance-Number(amount))}</p><p className="mt-3 border-t border-slate-200 pt-3 text-xs leading-5 text-slate-600">Reason: {reason}</p></div><div className="mt-5 flex gap-3"><button onClick={()=>setConfirming(false)} className="flex-1 rounded-xl border border-slate-200 p-3 text-sm font-bold text-slate-600">Go back</button><button disabled={busy} onClick={()=>void confirmAdjustment()} className={`flex-1 rounded-xl p-3 text-sm font-bold text-white disabled:opacity-50 ${action==="add"?"bg-emerald-600":"bg-rose-600"}`}>{busy?"Saving…":"Confirm & save"}</button></div></section></div>}
+      {confirming && <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#071126]/65 p-4" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)setConfirming(false)}}><section role="dialog" aria-modal="true" aria-labelledby="confirm-adjustment-title" className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"><div className="flex items-start justify-between"><div><p className="text-[10px] font-extrabold uppercase tracking-[.2em] text-blue-700">FINAL REVIEW</p><h2 id="confirm-adjustment-title" className="mt-2 text-xl font-extrabold text-slate-900">Confirm balance change</h2></div><button onClick={()=>setConfirming(false)} aria-label="Close confirmation" className="rounded-full bg-slate-100 p-2 text-slate-500"><X size={17}/></button></div><div className="mt-5 rounded-xl bg-slate-50 p-4"><p className="text-xs text-slate-500">Account · {selected}</p><p className={`mt-2 text-2xl font-extrabold ${action==="add"?"text-emerald-700":"text-rose-700"}`}>{action==="add"?"+":"−"}{currencyDisplay} {money(amount)}</p><p className="mt-2 text-xs text-slate-600">New project balance: {currencyDisplay} {money(action==="add"?selectedBalance+Number(amount):selectedBalance-Number(amount))}</p><p className="mt-3 border-t border-slate-200 pt-3 text-xs leading-5 text-slate-600">Category: {reasonCategory}{reason ? ` · ${reason}` : ""}{action === "add" ? ` · Sender: ${senderName}` : recipientName ? ` · Recipient: ${recipientName}` : ""}</p></div><div className="mt-5 flex gap-3"><button onClick={()=>setConfirming(false)} className="flex-1 rounded-xl border border-slate-200 p-3 text-sm font-bold text-slate-600">Go back</button><button disabled={busy} onClick={()=>void confirmAdjustment()} className={`flex-1 rounded-xl p-3 text-sm font-bold text-white disabled:opacity-50 ${action==="add"?"bg-emerald-600":"bg-rose-600"}`}>{busy?"Saving…":"Confirm & save"}</button></div></section></div>}
     </main>
   );
 }
