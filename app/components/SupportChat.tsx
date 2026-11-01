@@ -24,7 +24,10 @@ export default function SupportChat({ mode, popup = false }: { mode: ChatMode; p
   const [popupOpen, setPopupOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [notice, setNotice] = useState("");
-  const previousUnread = useRef(0);\n  const [launcherPosition, setLauncherPosition] = useState<{x:number;y:number}|null>(null);\n  const dragStart = useRef<{pointerX:number;pointerY:number;left:number;top:number}|null>(null);
+  const previousUnread = useRef(0);
+  const [launcherPosition, setLauncherPosition] = useState<{x:number;y:number}|null>(null);
+  const dragStart = useRef<{pointerX:number;pointerY:number;left:number;top:number}|null>(null);
+  const didDrag = useRef(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const typingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -63,7 +66,14 @@ export default function SupportChat({ mode, popup = false }: { mode: ChatMode; p
     }
   }, [mode, supabase, popupOpen]);
 
-  useEffect(() => {\n    if (!popup) return;\n    const openSupport = () => { setPopupOpen(true); setNotice(""); };\n    window.addEventListener("atlas-open-support", openSupport);\n    return () => window.removeEventListener("atlas-open-support", openSupport);\n  }, [popup]);\n\n  useEffect(() => {
+  useEffect(() => {
+    if (!popup) return;
+    const openSupport = () => { setPopupOpen(true); setNotice(""); };
+    window.addEventListener("atlas-open-support", openSupport);
+    return () => window.removeEventListener("atlas-open-support", openSupport);
+  }, [popup]);
+
+  useEffect(() => {
     let alive = true;
     (async () => {
       const { data } = await supabase.auth.getSession();
@@ -180,7 +190,6 @@ export default function SupportChat({ mode, popup = false }: { mode: ChatMode; p
   if (popup) {
     return (
       <div className="fixed z-[70]" style={launcherPosition ? { left: launcherPosition.x, top: launcherPosition.y } : { right: 20, bottom: 20 }}>
-        {notice && !popupOpen && <div role="status" className="mb-3 max-w-[280px] rounded-xl border border-blue-100 bg-white p-3 text-xs font-semibold text-slate-700 shadow-xl">{notice}</div>}
         {popupOpen && <section role="dialog" aria-modal="false" aria-label="ATLAS customer support" className="mb-3 flex h-[min(620px,78vh)] w-[min(390px,calc(100vw-2rem))] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
           <div className="flex items-center justify-between bg-[#102344] px-4 py-3 text-white">
             <span className="flex items-center gap-2"><Headphones size={19}/><span><b className="block text-sm">ATLAS live support</b><small className="text-[11px] text-blue-100">Chat with our support team</small></span></span>
@@ -205,12 +214,15 @@ export default function SupportChat({ mode, popup = false }: { mode: ChatMode; p
           aria-label={popupOpen ? "Close support chat" : "Open support chat"}
           onPointerDown={event => {
             const rect = event.currentTarget.getBoundingClientRect();
+            didDrag.current = false;
             dragStart.current = { pointerX: event.clientX, pointerY: event.clientY, left: rect.left, top: rect.top };
             event.currentTarget.setPointerCapture(event.pointerId);
           }}
           onPointerMove={event => {
             if (!dragStart.current || !(event.buttons & 1)) return;
             const start = dragStart.current;
+            if (Math.abs(event.clientX - start.pointerX) > 5 || Math.abs(event.clientY - start.pointerY) > 5) didDrag.current = true;
+            if (!didDrag.current) return;
             const width = event.currentTarget.offsetWidth;
             const height = event.currentTarget.offsetHeight;
             const x = Math.max(8, Math.min(window.innerWidth - width - 8, start.left + event.clientX - start.pointerX));
@@ -218,7 +230,7 @@ export default function SupportChat({ mode, popup = false }: { mode: ChatMode; p
             setLauncherPosition({ x, y });
           }}
           onPointerUp={event => { dragStart.current = null; }}
-          onClick={() => { setPopupOpen(v=>!v); setNotice(""); }}
+          onClick={() => { if (didDrag.current) { didDrag.current = false; return; } setPopupOpen(v=>!v); setNotice(""); }}
           className="relative grid h-14 w-14 place-items-center rounded-full bg-[#102344] text-white shadow-xl ring-2 ring-white transition hover:scale-105 hover:bg-blue-900"
           style={{ touchAction: "none", cursor: "grab" }}
         >
