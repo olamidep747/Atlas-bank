@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import SupportChat from "@/app/components/SupportChat";
 import {
   ArrowRight, ArrowUpRight, ShieldCheck, Globe2, Zap, Headphones,
   Menu, X, CreditCard, Wallet, Landmark, ChevronDown, LockKeyhole,
@@ -63,6 +64,7 @@ export default function Home() {
       <section className="section faq-section"><div><div className="section-kicker">A FEW THINGS YOU MAY BE WONDERING</div><h2>Good to<br/>know.</h2><p>Some quick answers about the ATLAS experience.</p></div><div className="faq-list">{["What is ATLAS Bank?","Can I access my account on mobile?","How does ATLAS approach security?","Where can I learn about account eligibility?"].map((q,i)=><div className="faq-item" key={q}><button onClick={()=>setFaqOpen(faqOpen===i?null:i)}><span>{q}</span>{faqOpen===i?<X size={18}/>:<ChevronDown size={18}/>}</button>{faqOpen===i&&<p>{["ATLAS is a digital banking concept focused on a clear, modern experience for managing your financial life. Product availability and services will be confirmed before launch.","The experience is being designed to work beautifully across desktop and mobile devices.","Security is a core design priority. Actual protection features will be documented and implemented before any live banking service launches.","Eligibility, supported regions, fees, and account terms will be published clearly when the relevant products are available."][i]}</p>}</div>)}</div></section>
 
       <footer className="footer"><div className="footer-main"><a className="brand footer-brand" href="#"><span className="brand-mark"><svg viewBox="0 0 48 48"><path d="M5 39 20 8q2-4 6 0l17 31H31L24 24 17 39Z" fill="currentColor"/><path d="M8 34Q21 17 44 18 28 23 20 34Z" fill="#FFD84D"/></svg></span><span>ATLAS<span className="brand-bank">BANK</span></span></a><p>Your Future. Our Priority.</p><div className="footer-links"><a href="#features">Personal banking</a><a href="#about">About ATLAS</a><a href="#get-started">Get started</a></div></div><div className="footer-bottom"><span>© {new Date().getFullYear()} ATLAS Bank. All rights reserved.</span><span>Designed for clarity. Built for possibility.</span></div><p className="disclaimer">ATLAS is a brand concept. This website is not a banking licence, deposit-taking service, or offer of financial products. No real accounts or transactions are available through this homepage.</p></footer>
+      <SupportChat mode="customer" popup />
     </main>
   );
 }
