@@ -133,7 +133,7 @@ export default function AdminPage() {
     setScheduleBusy(true);
     setScheduleConfirming(false);
     setMessage("");
-    const { data, error } = await getSupabaseBrowserClient().rpc("atlas_admin_schedule_payment", {
+    const { error } = await getSupabaseBrowserClient().rpc("atlas_admin_schedule_payment", {
       p_account_number: selected,
       p_amount: value,
       p_sender_name: scheduleSender.trim(),
@@ -273,7 +273,7 @@ export default function AdminPage() {
               <label className="block text-xs font-bold text-slate-600">Payment category<select value={scheduleCategory} onChange={e=>setScheduleCategory(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm outline-none focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-50">{["Incoming transfer","Account credit","Cash deposit","Refund","Other"].map(v=><option key={v}>{v}</option>)}</select></label>
               <label className="block text-xs font-bold text-slate-600">Date and time<input type="datetime-local" value={scheduleDate} onChange={e=>setScheduleDate(e.target.value)} min={(() => { const d = new Date(Date.now() + 60000); const pad = (n: number) => String(n).padStart(2, "0"); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`; })()} required className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm outline-none focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-50"/></label>
               <label className="block text-xs font-bold text-slate-600">Description (optional)<textarea rows={2} value={scheduleDescription} onChange={e=>setScheduleDescription(e.target.value)} placeholder="Add a payment note…" className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm outline-none focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-50"/></label>
-              <button disabled={scheduleBusy || loading || !selected} className="w-full rounded-xl bg-[#153a70] p-3.5 text-sm font-extrabold text-white shadow-lg shadow-blue-900/10 transition hover:bg-[#1b4b8e] disabled:opacity-50">{scheduleBusy ? "Scheduling…" : "Schedule payment"}</button>
+              <button disabled={scheduleBusy || loading || !selected || !scheduleAmount || Number(scheduleAmount) <= 0 || !scheduleSender.trim() || !scheduleDate || new Date(scheduleDate).getTime() <= Date.now()} className="w-full rounded-xl bg-[#153a70] p-3.5 text-sm font-extrabold text-white shadow-lg shadow-blue-900/10 transition hover:bg-[#1b4b8e] disabled:cursor-not-allowed disabled:opacity-40">Review schedule</button>
             </form>
             <p className="mt-4 rounded-xl bg-amber-50 p-3 text-[11px] leading-5 text-amber-900">This schedules an Atlas account-balance credit only. It does not send funds to an external bank or process real-money payments.</p>
           </div>
