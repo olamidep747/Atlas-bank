@@ -30,7 +30,15 @@ export default function AdminPage() {
   const [reasonCategory, setReasonCategory] = useState("Incoming transfer");
   const [senderName, setSenderName] = useState("");
   const [recipientName, setRecipientName] = useState("");
-  const [confirming, setConfirming] = useState(false);\n  const [scheduledPayments, setScheduledPayments] = useState<ScheduledPayment[]>([]);\n  const [scheduleAmount, setScheduleAmount] = useState("");\n  const [scheduleSender, setScheduleSender] = useState("");\n  const [scheduleCategory, setScheduleCategory] = useState("Incoming transfer");\n  const [scheduleDescription, setScheduleDescription] = useState("");\n  const [scheduleDate, setScheduleDate] = useState("");\n  const [scheduleBusy, setScheduleBusy] = useState(false);
+  const [confirming, setConfirming] = useState(false);
+  const [scheduledPayments, setScheduledPayments] = useState<ScheduledPayment[]>([]);
+  const [scheduleAmount, setScheduleAmount] = useState("");
+  const [scheduleSender, setScheduleSender] = useState("");
+  const [scheduleCategory, setScheduleCategory] = useState("Incoming transfer");
+  const [scheduleDescription, setScheduleDescription] = useState("");
+  const [scheduleDate, setScheduleDate] = useState("");
+  const [scheduleBusy, setScheduleBusy] = useState(false);
+  const [scheduleConfirming, setScheduleConfirming] = useState(false);
 
   const loadAccounts = useCallback(async () => {
     setLoading(true);
@@ -47,6 +55,12 @@ export default function AdminPage() {
     const rows = Array.isArray(data) ? data as Account[] : [];
     setAccounts(rows);
     setSelected((current) => rows.some((a) => String(a.account_number ?? "") === current) ? current : String(rows[0]?.account_number ?? ""));
+    const { data: scheduledRows, error: scheduledError } = await supabase.rpc("atlas_admin_list_scheduled_payments");
+    if (!scheduledError) setScheduledPayments(Array.isArray(scheduledRows) ? scheduledRows as ScheduledPayment[] : []);
+    else {
+      setMessageKind("error");
+      setMessage("Accounts loaded, but scheduled-payment history could not be refreshed: " + scheduledError.message);
+    }
     setLoading(false);
   }, [router]);
 
@@ -109,9 +123,17 @@ export default function AdminPage() {
       setMessage("Choose an Atlas account, enter a valid amount and sender, and select a future date and time.");
       return;
     }
-    setScheduleBusy(true);
     setMessage("");
-    const { error } = await getSupabaseBrowserClient().rpc("atlas_admin_schedule_payment", {
+    setScheduleConfirming(true);
+  }
+
+  async function confirmScheduledPayment() {
+    const value = Number(scheduleAmount);
+    const when = new Date(scheduleDate);
+    setScheduleBusy(true);
+    setScheduleConfirming(false);
+    setMessage("");
+    const { data, error } = await getSupabaseBrowserClient().rpc("atlas_admin_schedule_payment", {
       p_account_number: selected,
       p_amount: value,
       p_sender_name: scheduleSender.trim(),
@@ -121,10 +143,10 @@ export default function AdminPage() {
     });
     if (error) {
       setMessageKind("error");
-      setMessage(error.message);
+      setMessage("Payment was not scheduled: " + error.message);
     } else {
       setMessageKind("success");
-      setMessage(`Scheduled ${currencyDisplay} ${money(value)} for Atlas account ${selected}.`);
+      setMessage(`Payment scheduled successfully for account ${selected}. It will appear in Scheduled payments below.`);
       setScheduleAmount("");
       setScheduleSender("");
       setScheduleDescription("");
@@ -147,7 +169,8 @@ export default function AdminPage() {
     }
     setScheduleBusy(false);
   }
-\n  async function updateAccountStatus(nextStatus: string) {
+
+  async function updateAccountStatus(nextStatus: string) {
     if (!selectedAccount || !selected) return;
     setBusy(true); setMessage("");
     const { error } = await getSupabaseBrowserClient().rpc("novexxa_admin_update_account", {
@@ -248,7 +271,7 @@ export default function AdminPage() {
               <label className="block text-xs font-bold text-slate-600">Amount ({currencyDisplay})<input type="number" min="0.01" step="0.01" value={scheduleAmount} onChange={e=>setScheduleAmount(e.target.value)} placeholder="0.00" required className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm font-bold outline-none focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-50"/></label>
               <label className="block text-xs font-bold text-slate-600">Sender name<input value={scheduleSender} onChange={e=>setScheduleSender(e.target.value)} placeholder="Person or company name" required className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm outline-none focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-50"/></label>
               <label className="block text-xs font-bold text-slate-600">Payment category<select value={scheduleCategory} onChange={e=>setScheduleCategory(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm outline-none focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-50">{["Incoming transfer","Account credit","Cash deposit","Refund","Other"].map(v=><option key={v}>{v}</option>)}</select></label>
-              <label className="block text-xs font-bold text-slate-600">Date and time<input type="datetime-local" value={scheduleDate} onChange={e=>setScheduleDate(e.target.value)} min={new Date(Date.now()+60000).toISOString().slice(0,16)} required className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm outline-none focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-50"/></label>
+              <label className="block text-xs font-bold text-slate-600">Date and time<input type="datetime-local" value={scheduleDate} onChange={e=>setScheduleDate(e.target.value)} min={(() => { const d = new Date(Date.now() + 60000); const pad = (n: number) => String(n).padStart(2, "0"); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`; })()} required className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm outline-none focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-50"/></label>
               <label className="block text-xs font-bold text-slate-600">Description (optional)<textarea rows={2} value={scheduleDescription} onChange={e=>setScheduleDescription(e.target.value)} placeholder="Add a payment note…" className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm outline-none focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-50"/></label>
               <button disabled={scheduleBusy || loading || !selected} className="w-full rounded-xl bg-[#153a70] p-3.5 text-sm font-extrabold text-white shadow-lg shadow-blue-900/10 transition hover:bg-[#1b4b8e] disabled:opacity-50">{scheduleBusy ? "Scheduling…" : "Schedule payment"}</button>
             </form>
@@ -261,6 +284,7 @@ export default function AdminPage() {
         </section>
         <a href="/admin/support" className="mt-8 flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-blue-300 hover:shadow-md"><span className="grid h-12 w-12 place-items-center rounded-xl bg-blue-50 text-blue-700"><Headphones size={23}/></span><span className="min-w-0 flex-1"><b className="block text-base text-[#102344]">Customer support inbox</b><small className="mt-1 block text-xs text-slate-500">Open customer conversations and reply in the full chat workspace.</small></span><span className="text-sm font-bold text-blue-700">Open inbox →</span></a>
       </section>
+      {scheduleConfirming && <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#071126]/70 p-4" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)setScheduleConfirming(false)}}><section role="dialog" aria-modal="true" aria-labelledby="confirm-schedule-title" className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"><div className="flex items-start justify-between"><div><p className="text-[10px] font-extrabold uppercase tracking-[.2em] text-blue-700">SCHEDULE REVIEW</p><h2 id="confirm-schedule-title" className="mt-2 text-xl font-extrabold text-slate-900">Confirm scheduled payment</h2></div><button type="button" onClick={()=>setScheduleConfirming(false)} aria-label="Close schedule confirmation" className="rounded-full bg-slate-100 p-2 text-slate-500"><X size={17}/></button></div><div className="mt-5 space-y-3 rounded-xl bg-slate-50 p-4 text-sm"><div className="flex justify-between gap-4"><span className="text-slate-500">Atlas account</span><b className="text-right text-slate-800">{selected}</b></div><div className="flex justify-between gap-4"><span className="text-slate-500">Amount</span><b className="text-right text-emerald-700">{currencyDisplay} {money(scheduleAmount)}</b></div><div className="flex justify-between gap-4"><span className="text-slate-500">Sender</span><b className="text-right text-slate-800">{scheduleSender}</b></div><div className="flex justify-between gap-4"><span className="text-slate-500">Category</span><b className="text-right text-slate-800">{scheduleCategory}</b></div><div className="flex justify-between gap-4"><span className="text-slate-500">Scheduled time</span><b className="text-right text-slate-800">{new Date(scheduleDate).toLocaleString()}</b></div>{scheduleDescription && <div className="border-t border-slate-200 pt-3 text-slate-600">{scheduleDescription}</div>}</div><p className="mt-3 text-xs leading-5 text-amber-800">This will schedule an Atlas account-balance credit only. It does not send money to an external bank.</p><div className="mt-5 flex gap-3"><button type="button" onClick={()=>setScheduleConfirming(false)} className="flex-1 rounded-xl border border-slate-200 p-3 text-sm font-bold text-slate-600">Edit details</button><button type="button" disabled={scheduleBusy} onClick={()=>void confirmScheduledPayment()} className="flex-1 rounded-xl bg-[#153a70] p-3 text-sm font-bold text-white disabled:opacity-50">{scheduleBusy ? "Saving…" : "Confirm schedule"}</button></div></section></div>}
       {confirming && <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#071126]/65 p-4" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)setConfirming(false)}}><section role="dialog" aria-modal="true" aria-labelledby="confirm-adjustment-title" className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"><div className="flex items-start justify-between"><div><p className="text-[10px] font-extrabold uppercase tracking-[.2em] text-blue-700">FINAL REVIEW</p><h2 id="confirm-adjustment-title" className="mt-2 text-xl font-extrabold text-slate-900">Confirm balance change</h2></div><button onClick={()=>setConfirming(false)} aria-label="Close confirmation" className="rounded-full bg-slate-100 p-2 text-slate-500"><X size={17}/></button></div><div className="mt-5 rounded-xl bg-slate-50 p-4"><p className="text-xs text-slate-500">Account · {selected}</p><p className={`mt-2 text-2xl font-extrabold ${action==="add"?"text-emerald-700":"text-rose-700"}`}>{action==="add"?"+":"−"}{currencyDisplay} {money(amount)}</p><p className="mt-2 text-xs text-slate-600">New project balance: {currencyDisplay} {money(action==="add"?selectedBalance+Number(amount):selectedBalance-Number(amount))}</p><p className="mt-3 border-t border-slate-200 pt-3 text-xs leading-5 text-slate-600">Category: {reasonCategory}{reason ? ` · ${reason}` : ""}{action === "add" ? ` · Sender: ${senderName}` : recipientName ? ` · Recipient: ${recipientName}` : ""}</p></div><div className="mt-5 flex gap-3"><button onClick={()=>setConfirming(false)} className="flex-1 rounded-xl border border-slate-200 p-3 text-sm font-bold text-slate-600">Go back</button><button disabled={busy} onClick={()=>void confirmAdjustment()} className={`flex-1 rounded-xl p-3 text-sm font-bold text-white disabled:opacity-50 ${action==="add"?"bg-emerald-600":"bg-rose-600"}`}>{busy?"Saving…":"Confirm & save"}</button></div></section></div>}
     </main>
   );
